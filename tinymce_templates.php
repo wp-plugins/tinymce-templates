@@ -30,6 +30,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+define('TINYMCE_TEMPLATES_PLUGIN_URL', WP_PLUGIN_URL.'/'.dirname(plugin_basename(__FILE__)));
+
 require_once(dirname(__FILE__).'/includes/mceplugins.class.php');
 require_once(dirname(__FILE__).'/includes/TinyMCETemplate.class.php');
 require_once(dirname(__FILE__).'/includes/MceTemplatesAdmin.class.php');
@@ -96,7 +98,7 @@ class MceTemplates{
             'edit_pages',
             'edittemplates',
             '',
-            WP_PLUGIN_URL.'/'.$this->name.'/img/icon.png'
+            WP_PLUGIN_URL.'/'.dirname(plugin_basename(__FILE__)).'/img/icon.png'
         );
         add_submenu_page(
             'edittemplates',

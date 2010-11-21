@@ -8,14 +8,14 @@ class TinyMCETemplate{
 
     function __construct()
     {
-        $url = WP_PLUGIN_URL.'/tinymce_templates';
-        $plugin = $url.'/mce_plugins/plugins/template/editor_plugin.js';
+        $plugin = TINYMCE_TEMPLATES_PLUGIN_URL.'/mce_plugins/plugins/template/editor_plugin.js';
         $path = dirname(__FILE__).'/../mce_plugins/plugins';
         $lang = $path.'/template/langs/langs.php';
         $inits = array();
         $url = get_bloginfo('url');
         $inits['template_external_list_url'] = $url.'/mce_templates.js';
-        $this->mce_css = $url.'/editor.css';
+        $this->mce_css = TINYMCE_TEMPLATES_PLUGIN_URL.'/editor.css';
+        $inits['content_css'] = $this->mce_css;
         new mcePlugins(
             'template',
             $plugin,

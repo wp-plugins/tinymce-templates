@@ -8,7 +8,7 @@ class MceTemplatesAdmin{
         $this->domain   = $class->name;
         $this->table    = $wpdb->prefix.$class->table;
 
-        echo '<link rel="stylesheet" href="'.WP_PLUGIN_URL.'/'.$this->domain.'/style.css" type="text/css" media="all" />';
+        echo '<link rel="stylesheet" href="'.TINYMCE_TEMPLATES_PLUGIN_URL.'/style.css" type="text/css" media="all" />';
 
         echo '<div class="wrap">';
 
