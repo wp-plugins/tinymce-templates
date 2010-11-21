@@ -1,4 +1,4 @@
-=== Enhancing CSS ===
+=== TinyMCE Templates ===
 Contributors: miyauchi
 Donate link: http://firegoby.theta.ne.jp/
 Tags: tinymce, Visual Editor, template
