@@ -6,17 +6,17 @@ Requires at least: 3.0
 Tested up to: 3.0
 Stable tag: 0.1
 
-TinyMCE Template plugin will enable to use Template System on WordPress Visula Editor.
+TinyMCE Template plugin will enable to use HTML template on WordPress Visual Editor.
 You can edit and share this template with WordPress users.
 
 == Description ==
 
-TinyMCE Template plugin will enable to use Template System on WordPress Visula Editor.
+TinyMCE Template plugin will enable to use HTML template on WordPress Visual Editor.
 You can edit and share this template with WordPress users.
 
 If you will install this plugin, You will be very easy to edit posts and pages.
 
-* [Plugin Homepage](http://firegoby.theta.ne.jp/wp/tinymce_templates)
+* [Plugin Homepage](http://firegoby.theta.ne.jp/wp/tinymce_templates) (Japanese)
 * [Support](http://wordpress.org/tags/tinymce_templates)
 
 = Some features: =
@@ -41,8 +41,8 @@ You can send your own language pack to me.
 
 == Screenshots ==
 
-1. Visual Editor.
-2. Template Admin.
+1. Template Admin.
+2. Visual Editor.
 
 == Changelog ==
 = 0.1 =
