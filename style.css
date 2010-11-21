@@ -1,0 +1,57 @@
+.wrap h2
+{
+    padding-left: 40px;
+    margin-bottom: 1em;
+    background-image: url(img/large.png);
+    background-repeat: no-repeat;
+    background-position: left center;
+    line-height: 32px;
+    height: 32px;
+}
+
+.ex
+{
+    margin: 1em 0;
+    background-color: #ffffff;
+    font-family: monospace !important;
+    border: 1px dashed #dedede;
+    padding: 1em;
+    font-size: 14px;
+}
+
+.button-secondary
+{
+    margin: 0.5em 0;
+}
+
+.note
+{
+    margin-top: 2em;
+}
+
+.widefat
+{
+    margin: 8px 0;
+}
+
+#name,
+#desc,
+#html
+{
+    width: 100%;
+}
+
+#desc
+{
+    height: 3em;
+}
+
+#html
+{
+    height: 10em;
+}
+
+#save
+{
+    margin: 1em 0;
+}
