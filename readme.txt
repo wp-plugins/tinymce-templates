@@ -44,10 +44,6 @@ You can send your own language pack to me.
 1. Template Admin.
 2. Visual Editor.
 
-== Changelog ==
-= 0.1 =
-* The first release.
-
 == Credits ==
 
 This plug-in is not guaranteed though the user of WordPress can freely use this plug-in free of charge regardless of the purpose.
