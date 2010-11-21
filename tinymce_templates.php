@@ -98,7 +98,7 @@ class MceTemplates{
             'edit_pages',
             'edittemplates',
             '',
-            WP_PLUGIN_URL.'/'.dirname(plugin_basename(__FILE__)).'/img/icon.png'
+            TINYMCE_TEMPLATES_PLUGIN_URL.'/img/icon.png'
         );
         add_submenu_page(
             'edittemplates',
