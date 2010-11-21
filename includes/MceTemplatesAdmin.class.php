@@ -1,13 +1,8 @@
 <?php
 
 class MceTemplatesAdmin{
-    function MceTemplatesAdmin($class)
+    function __construct()
     {
-        global $wpdb;
-
-        $this->domain   = $class->name;
-        $this->table    = $wpdb->prefix.$class->table;
-
         echo '<link rel="stylesheet" href="'.TINYMCE_TEMPLATES_PLUGIN_URL.'/style.css" type="text/css" media="all" />';
 
         echo '<div class="wrap">';
@@ -26,16 +21,16 @@ class MceTemplatesAdmin{
     }
 
 
-    function editView()
+    public function editView()
     {
         global $wpdb;
         global $current_user;
 
-        echo '<h2>'.__("Edit Templates", $this->domain).'</h2>';
+        echo '<h2>'.__("Edit Templates", TINYMCE_TEMPLATES_DOMAIN).'</h2>';
 
         if (isset($_POST['templates']) && is_array($_POST['templates'])) {
             $this->delete();
-            echo '<div id="message" class="updated fade"><p>'.$n.__("Templates permanently deleted.", $this->domain).'</p></div>';
+            echo '<div id="message" class="updated fade"><p>'.$n.__("Templates permanently deleted.", TINYMCE_TEMPLATES_DOMAIN).'</p></div>';
         }
 
         echo "<form method=\"post\" action=\"{$_SERVER['REQUEST_URI']}\">";
@@ -43,24 +38,24 @@ class MceTemplatesAdmin{
         echo '<thead>';
         echo '<tr>';
         echo '<th scope="col" class="column-cb check-column"><input type="checkbox" /></th>';
-        echo '<th scope="col">'.__('Name', $this->domain).'</th>';
-        echo '<th scope="col">'.__('Description', $this->domain).'</th>';
-        echo '<th scope="col">'.__('Author', $this->domain).'</th>';
-        echo '<th scope="col">'.__('Share', $this->domain).'</th>';
+        echo '<th scope="col">'.__('Name', TINYMCE_TEMPLATES_DOMAIN).'</th>';
+        echo '<th scope="col">'.__('Description', TINYMCE_TEMPLATES_DOMAIN).'</th>';
+        echo '<th scope="col">'.__('Author', TINYMCE_TEMPLATES_DOMAIN).'</th>';
+        echo '<th scope="col">'.__('Share', TINYMCE_TEMPLATES_DOMAIN).'</th>';
         echo '</tr>';
         echo '</thead>';
         echo '<tfoot>';
         echo '<tr>';
         echo '<th scope="col" class="column-cb check-column"><input type="checkbox" /></th>';
-        echo '<th scope="col">'.__('Name', $this->domain).'</th>';
-        echo '<th scope="col">'.__('Description', $this->domain).'</th>';
-        echo '<th scope="col">'.__('Author', $this->domain).'</th>';
-        echo '<th scope="col">'.__('Share', $this->domain).'</th>';
+        echo '<th scope="col">'.__('Name', TINYMCE_TEMPLATES_DOMAIN).'</th>';
+        echo '<th scope="col">'.__('Description', TINYMCE_TEMPLATES_DOMAIN).'</th>';
+        echo '<th scope="col">'.__('Author', TINYMCE_TEMPLATES_DOMAIN).'</th>';
+        echo '<th scope="col">'.__('Share', TINYMCE_TEMPLATES_DOMAIN).'</th>';
         echo '</tr>';
         echo '</tfoot>';
         echo '<tbody>';
 
-        $sql = "select * from {$this->table}
+        $sql = "select * from ".TINYMCE_TEMPLATES_TABLE."
             where `author`={$current_user->ID} or `share`=1 order by `modified` desc";
         $row = $wpdb->get_results($sql);
 
@@ -91,28 +86,28 @@ class MceTemplatesAdmin{
             $author = get_userdata($tpl->author);
             echo '<td>'.esc_html($author->nickname).'</td>';
             if ($tpl->share) {
-                echo '<td>'.__('Shared', $this->domain).'</td>';
+                echo '<td>'.__('Shared', TINYMCE_TEMPLATES_DOMAIN).'</td>';
             } else {
-                echo '<td>'.__('Private', $this->domain).'</td>';
+                echo '<td>'.__('Private', TINYMCE_TEMPLATES_DOMAIN).'</td>';
             }
             echo "</tr>";
             $i = $i + 1;
         }
         echo "</tbody>";
         echo "</table>";
-        echo '<input type="submit" value="'.__("Delete checked items", $this->domain).'" class="button-secondary" />';
+        echo '<input type="submit" value="'.__("Delete checked items", TINYMCE_TEMPLATES_DOMAIN).'" class="button-secondary" />';
         echo "</form>";
     }
 
-    function addView()
+    public function addView()
     {
         global $current_user;
 
         if (isset($_POST['save']) && $_POST['save']) {
             if ($this->validate() && $this->save()) {
-                echo "<div id=\"message\" class=\"updated fade\"><p><strong>".__("Template saved.", $this->domain)."</strong></p></div>";
+                echo "<div id=\"message\" class=\"updated fade\"><p><strong>".__("Template saved.", TINYMCE_TEMPLATES_DOMAIN)."</strong></p></div>";
                 global $wpdb;
-                $sql = $wpdb->prepare("select * from {$this->table}
+                $sql = $wpdb->prepare("select * from ".TINYMCE_TEMPLATES_TABLE."
                             where `id`=%s", $_POST['id']);
                 $r = $wpdb->get_row($sql);
                 $id     = $r->ID;
@@ -121,7 +116,7 @@ class MceTemplatesAdmin{
                 $html   = stripslashes($r->html);
                 $share  = $r->share;
             } else {
-                echo "<div id=\"message\" class=\"error fade\"><p><strong>".__("All entry must not be blank.", $this->domain)."</strong></p></div>";
+                echo "<div id=\"message\" class=\"error fade\"><p><strong>".__("All entry must not be blank.", TINYMCE_TEMPLATES_DOMAIN)."</strong></p></div>";
                 $id     = $_POST['id'];
                 $name   = $_POST['name'];
                 $desc   = $_POST['desc'];
@@ -131,8 +126,9 @@ class MceTemplatesAdmin{
         } elseif (isset($_GET['page']) && $_GET['page'] == 'edittemplates'
             && isset($_GET['id']) && preg_match("/^[a-zA-Z0-9]{32}$/", $_GET['id'])) {
                 global $wpdb;
-                $sql = $wpdb->prepare("select * from {$this->table}
-                            where `ID`=%s and author=%s", $_GET['id'], $current_user->ID);
+                $sql = $wpdb->prepare("select * from ".TINYMCE_TEMPLATES_TABLE."
+                            where `ID`=%s and author=%s", 
+                            $_GET['id'], $current_user->ID);
                 $r = $wpdb->get_row($sql);
                 if ($r) {
                     $id     = $r->ID;
@@ -153,36 +149,36 @@ class MceTemplatesAdmin{
 
         if (isset($_GET['page']) && $_GET['page'] == 'edittemplates'
                 && isset($_GET['id']) && preg_match("/^[a-zA-Z0-9]{32}$/", $_GET['id'])) {
-            echo '<h2>'.__("Edit Templates", $this->domain).'</h2>';
+            echo '<h2>'.__("Edit Templates", TINYMCE_TEMPLATES_DOMAIN).'</h2>';
         } else {
-            echo '<h2>'.__("Add New Templates", $this->domain).'</h2>';
+            echo '<h2>'.__("Add New Templates", TINYMCE_TEMPLATES_DOMAIN).'</h2>';
         }
         echo "<form action=\"{$_SERVER["REQUEST_URI"]}\" method=\"post\">";
         echo "<input type=\"hidden\" name=\"save\" value=\"1\" />";
         echo "<input type=\"hidden\" name=\"id\" value=\"{$id}\" />";
-        echo "<h3>".__("Template Name", $this->domain)."*</h3>";
+        echo "<h3>".__("Template Name", TINYMCE_TEMPLATES_DOMAIN)."*</h3>";
         echo "<input type=\"text\" id=\"name\" name=\"name\" value=\"{$name}\" />";
-        echo "<h3>".__("Template Description", $this->domain)."*</h3>";
+        echo "<h3>".__("Template Description", TINYMCE_TEMPLATES_DOMAIN)."*</h3>";
         echo "<textarea id=\"desc\" name=\"desc\">{$desc}</textarea>";
-        echo "<h3>".__("Template Contents", $this->domain)."*</h3>";
+        echo "<h3>".__("Template Contents", TINYMCE_TEMPLATES_DOMAIN)."*</h3>";
         echo "<textarea id=\"html\" name=\"html\">{$html}</textarea>";
-        echo "<h3>".__("Share", $this->domain)."*</h3>";
+        echo "<h3>".__("Share", TINYMCE_TEMPLATES_DOMAIN)."*</h3>";
         echo "<select name=\"share\" id=\"share\">";
         if ($share == 1) {
-            echo "<option value=\"1\" selected=\"selected\">".__("Share", $this->domain)."</option>";
-            echo "<option value=\"0\">".__("Private", $this->domain)."</option>";
+            echo "<option value=\"1\" selected=\"selected\">".__("Share", TINYMCE_TEMPLATES_DOMAIN)."</option>";
+            echo "<option value=\"0\">".__("Private", TINYMCE_TEMPLATES_DOMAIN)."</option>";
         } else {
-            echo "<option value=\"1\">".__("Share", $this->domain)."</option>";
-            echo "<option value=\"0\" selected=\"selected\">".__("Private", $this->domain)."</option>";
+            echo "<option value=\"1\">".__("Share", TINYMCE_TEMPLATES_DOMAIN)."</option>";
+            echo "<option value=\"0\" selected=\"selected\">".__("Private", TINYMCE_TEMPLATES_DOMAIN)."</option>";
         }
         echo "</select>";
         echo "<div id=\"save\">";
-        echo "<input type=\"submit\" value=\"".__("Save Template", $this->domain)."\" class=\"button-primary\" />";
+        echo "<input type=\"submit\" value=\"".__("Save Template", TINYMCE_TEMPLATES_DOMAIN)."\" class=\"button-primary\" />";
         echo "</div>";
         echo "</form>";
     }
 
-    function save()
+    private function save()
     {
         global $wpdb;
         global $current_user;
@@ -191,7 +187,7 @@ class MceTemplatesAdmin{
             return false;
         }
 
-        $sql = "insert into {$this->table}
+        $sql = "insert into ".TINYMCE_TEMPLATES_TABLE."
                     (`ID`, `name`, `desc`, `html`, `share`, `author`)
                 values
                     (%s, %s, %s, %s, %d, %d)
@@ -202,13 +198,14 @@ class MceTemplatesAdmin{
                     `html`=values(`html`),
                     `share`=values(`share`)
                 ";
-        $sql = $wpdb->prepare($sql, $_POST['id'], $_POST['name'], $_POST['desc'],
+        $sql = $wpdb->prepare($sql, $_POST['id'],
+                        $_POST['name'], $_POST['desc'],
                             $_POST['html'], $_POST['share'], $current_user->ID);
         $wpdb->query($sql);
         return true;
     }
 
-    function validate()
+    private function validate()
     {
         $pars = array('id', 'name', 'desc', 'html', 'share');
         foreach ($pars as $par):
@@ -229,12 +226,12 @@ class MceTemplatesAdmin{
         return true;
     }
 
-    function checkAuth($id)
+    private function checkAuth($id)
     {
         global $wpdb;
         global $current_user;
 
-        $sql = $wpdb->prepare("select author from {$this->table} where ID=%s", $id);
+        $sql = $wpdb->prepare("select author from ".TINYMCE_TEMPLATES_TABLE." where ID=%s", $id);
         $author = $wpdb->get_var($sql);
 
         if (!$author || $author === $current_user->ID) {
@@ -244,13 +241,13 @@ class MceTemplatesAdmin{
         }
     }
 
-    function delete()
+    private function delete()
     {
         global $wpdb;
         global $current_user;
 
         foreach ($_POST['templates'] as $tpl) {
-            $sql = "delete from {$this->table} where ID=%s and author=%s";
+            $sql = "delete from ".TINYMCE_TEMPLATES_TABLE." where ID=%s and author=%s";
             $sql = $wpdb->prepare($sql, $tpl, $current_user->ID);
             $wpdb->query($sql);
         }

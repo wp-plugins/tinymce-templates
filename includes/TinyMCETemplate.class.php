@@ -75,7 +75,7 @@ class TinyMCETemplate{
             }
 
             if( isset($_GET['id']) && strlen($_GET['id']) ){
-                $sql = "select html from {$wpdb->prefix}{$MceTemplates->table}
+                $sql = "select html from ".TINYMCE_TEMPLATES_TABLE."
                     where (`ID`=%s) and (`author`={$current_user->ID} or `share`=1)
                         order by `modified` desc";
                 $sql = $wpdb->prepare($sql, $_GET['id']);
@@ -86,7 +86,7 @@ class TinyMCETemplate{
                 exit;
             }
 
-            $sql = "select * from {$wpdb->prefix}{$MceTemplates->table}
+            $sql = "select * from ".TINYMCE_TEMPLATES_TABLE."
                 where `author`={$current_user->ID} or `share`=1
                     order by `modified` desc";
             $row = $wpdb->get_results($sql);

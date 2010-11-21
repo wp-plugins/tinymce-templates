@@ -31,6 +31,8 @@ THE SOFTWARE.
 */
 
 define('TINYMCE_TEMPLATES_PLUGIN_URL', WP_PLUGIN_URL.'/'.dirname(plugin_basename(__FILE__)));
+define('TINYMCE_TEMPLATES_TABLE', $wpdb->prefix.'mce_template');
+define('TINYMCE_TEMPLATES_DOMAIN', 'tinymce_templates');
 
 require_once(dirname(__FILE__).'/includes/mceplugins.class.php');
 require_once(dirname(__FILE__).'/includes/TinyMCETemplate.class.php');
@@ -42,24 +44,20 @@ register_deactivation_hook (__FILE__, array(&$MceTemplates, 'deactivation'));
 
 class MceTemplates{
 
-    var $name   = 'tinymce_templates';
-    var $table  = 'mce_template';
+//    private $name   = 'tinymce_templates';
+//    private $table  = 'mce_template';
 
 //
 // construct
 //
-    function MceTemplates()
+    function __construct()
     {
         add_action('admin_menu', array(&$this, 'loadAdmin'));
     }
 
-    function activation()
+    public function activation()
     {
-        global $wpdb;
-
-        $this->table = $wpdb->prefix.$this->table;
-
-        $sql = "CREATE TABLE ".$this->table." (
+        $sql = "CREATE TABLE ".TINYMCE_TEMPLATES_TABLE." (
             `ID` varchar(32) NOT NULL,
             `name` varchar(50) NOT NULL,
             `desc` varchar(100) NOT NULL,
@@ -76,7 +74,7 @@ class MceTemplates{
         dbDelta($sql);
     }
 
-    function deactivation()
+    public function deactivation()
     {
         // nothing to do
     }
@@ -84,17 +82,17 @@ class MceTemplates{
 //
 // add admin menu
 //
-    function loadAdmin()
+    public function loadAdmin()
     {
         load_plugin_textdomain(
-            $this->name, 
+            TINYMCE_TEMPLATES_DOMAIN, 
             PLUGINDIR.'/'.dirname(plugin_basename(__FILE__)).'/langs', 
             dirname(plugin_basename(__FILE__)).'/langs'
         );
 
         add_menu_page(
-            __('tinyMCE Templates', $this->name),
-            __('Templates', $this->name),
+            __('tinyMCE Templates', TINYMCE_TEMPLATES_DOMAIN),
+            __('Templates', TINYMCE_TEMPLATES_DOMAIN),
             'edit_pages',
             'edittemplates',
             '',
@@ -102,16 +100,16 @@ class MceTemplates{
         );
         add_submenu_page(
             'edittemplates',
-            __('Edit Templates', $this->name),
-            __('Edit', $this->name),
+            __('Edit Templates', TINYMCE_TEMPLATES_DOMAIN),
+            __('Edit', TINYMCE_TEMPLATES_DOMAIN),
             'edit_pages',
             'edittemplates',
             array(&$this, 'adminPage')
         );
         add_submenu_page(
             'edittemplates',
-            __('Add New Templates', $this->name),
-            __('Add New', $this->name),
+            __('Add New Templates', TINYMCE_TEMPLATES_DOMAIN),
+            __('Add New', TINYMCE_TEMPLATES_DOMAIN),
             'edit_pages',
             'addnewtemplates',
             array(&$this, 'adminPage')
@@ -122,9 +120,9 @@ class MceTemplates{
 //
 // display mcetemplates list
 //
-    function adminPage()
+    public function adminPage()
     {
-        new MceTemplatesAdmin($this);
+        new MceTemplatesAdmin();
     }
 
 }
