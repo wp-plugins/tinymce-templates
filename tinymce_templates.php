@@ -57,7 +57,8 @@ class MceTemplates{
 
     public function activation()
     {
-        $sql = "CREATE TABLE ".TINYMCE_TEMPLATES_TABLE." (
+        global $wpdb;
+        $sql = "CREATE TABLE {$wpdb->prefix}mce_template (
             `ID` varchar(32) NOT NULL,
             `name` varchar(50) NOT NULL,
             `desc` varchar(100) NOT NULL,
