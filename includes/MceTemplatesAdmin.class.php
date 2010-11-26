@@ -156,13 +156,13 @@ class MceTemplatesAdmin{
         echo "<form action=\"{$_SERVER["REQUEST_URI"]}\" method=\"post\">";
         echo "<input type=\"hidden\" name=\"save\" value=\"1\" />";
         echo "<input type=\"hidden\" name=\"id\" value=\"{$id}\" />";
-        echo "<h3>".__("Template Name", TINYMCE_TEMPLATES_DOMAIN)."*</h3>";
+        echo "<h3>".__("Template Name", TINYMCE_TEMPLATES_DOMAIN)."</h3>";
         echo "<input type=\"text\" id=\"name\" name=\"name\" value=\"{$name}\" />";
-        echo "<h3>".__("Template Description", TINYMCE_TEMPLATES_DOMAIN)."*</h3>";
+        echo "<h3>".__("Template Description", TINYMCE_TEMPLATES_DOMAIN)."</h3>";
         echo "<textarea id=\"desc\" name=\"desc\">{$desc}</textarea>";
-        echo "<h3>".__("Template Contents", TINYMCE_TEMPLATES_DOMAIN)."*</h3>";
+        echo "<h3>".__("Template Contents", TINYMCE_TEMPLATES_DOMAIN)." (HTML)</h3>";
         echo "<textarea id=\"html\" name=\"html\">{$html}</textarea>";
-        echo "<h3>".__("Share", TINYMCE_TEMPLATES_DOMAIN)."*</h3>";
+        echo "<h3>".__("Share", TINYMCE_TEMPLATES_DOMAIN)."</h3>";
         echo "<select name=\"share\" id=\"share\">";
         if ($share == 1) {
             echo "<option value=\"1\" selected=\"selected\">".__("Share", TINYMCE_TEMPLATES_DOMAIN)."</option>";
