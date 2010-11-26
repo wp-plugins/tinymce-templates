@@ -1,10 +1,10 @@
 <?php
 /*
 Plugin Name: TinyMCE Templates
-Plugin URI: http://firegoby.theta.ne.jp/wp/mce_templates
+Plugin URI: http://firegoby.theta.ne.jp/wp/tinymce_templates
 Description: Manage & Add Tiny MCE template.
 Author: Takayuki Miyauchi (THETA NETWORKS Co,.Ltd)
-Version: 0.2
+Version: 0.3
 Author URI: http://firegoby.theta.ne.jp/
 */
 
@@ -34,6 +34,7 @@ define('TINYMCE_TEMPLATES_PLUGIN_URL', WP_PLUGIN_URL.'/'.dirname(plugin_basename
 define('TINYMCE_TEMPLATES_TABLE', $wpdb->prefix.'mce_template');
 define('TINYMCE_TEMPLATES_DOMAIN', 'tinymce_templates');
 
+require_once(dirname(__FILE__).'/includes/addrewriterules.class.php');
 require_once(dirname(__FILE__).'/includes/mceplugins.class.php');
 require_once(dirname(__FILE__).'/includes/TinyMCETemplate.class.php');
 require_once(dirname(__FILE__).'/includes/MceTemplatesAdmin.class.php');
@@ -43,9 +44,6 @@ register_activation_hook (__FILE__, array(&$MceTemplates, 'activation'));
 register_deactivation_hook (__FILE__, array(&$MceTemplates, 'deactivation'));
 
 class MceTemplates{
-
-//    private $name   = 'tinymce_templates';
-//    private $table  = 'mce_template';
 
 //
 // construct
