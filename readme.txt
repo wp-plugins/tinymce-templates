@@ -4,7 +4,7 @@ Donate link: http://firegoby.theta.ne.jp/
 Tags: tinymce, Visual Editor, template
 Requires at least: 3.0
 Tested up to: 3.0
-Stable tag: 0.3
+Stable tag: 0.31
 
 TinyMCE Template plugin will enable to use HTML template on WordPress Visual Editor.
 You can edit and share this template with WordPress users.
@@ -28,6 +28,7 @@ If you will install this plugin, You will be very easy to edit posts and pages.
 = Translators: =
 
 * Japanese(ja) - [Takayuki Miyauchi](http://firegoby.theta.ne.jp/)
+* Italian(it_IT) - [Andrea Bersi](http://www.andreabersi.com)
 
 You can send your own language pack to me.
 
