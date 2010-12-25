@@ -50,9 +50,6 @@ You can send your own language pack to me.
 This plug-in is not guaranteed though the user of WordPress can freely use this plug-in free of charge regardless of the purpose.
 The author must acknowledge the thing that the operation guarantee and the support in this plug-in use are not done at all beforehand.
 
-WordPress のユーザーは目的を問わず、このプラグインを無償で自由に利用することができますがこのプラグインは無保証です。
-作者はこのプラグインの利用における一切の動作保証とサポートを行わない事を予めご了承下さい。
-
 == Contact ==
 
 email to miya[at]theta.ne.jp
