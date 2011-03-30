@@ -4,7 +4,7 @@ Plugin Name: TinyMCE Templates
 Plugin URI: http://firegoby.theta.ne.jp/wp/tinymce_templates
 Description: Manage & Add Tiny MCE template.
 Author: Takayuki Miyauchi (THETA NETWORKS Co,.Ltd)
-Version: 0.31
+Version: 1.0.0
 Author URI: http://firegoby.theta.ne.jp/
 */
 
@@ -65,8 +65,8 @@ class MceTemplates{
             `author` bigint(20) unsigned NOT NULL,
             `modified` timestamp NOT NULL,
             UNIQUE KEY ID (`ID`))
-            ENGINE = MYISAM 
-            CHARACTER SET utf8 
+            ENGINE = MYISAM
+            CHARACTER SET utf8
             COLLATE utf8_unicode_ci;
         ";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -84,8 +84,8 @@ class MceTemplates{
     public function loadAdmin()
     {
         load_plugin_textdomain(
-            TINYMCE_TEMPLATES_DOMAIN, 
-            PLUGINDIR.'/'.dirname(plugin_basename(__FILE__)).'/langs', 
+            TINYMCE_TEMPLATES_DOMAIN,
+            PLUGINDIR.'/'.dirname(plugin_basename(__FILE__)).'/langs',
             dirname(plugin_basename(__FILE__)).'/langs'
         );
 

@@ -47,7 +47,7 @@ class TinyMCETemplate{
         $path = dirname(__FILE__).'/../mce_plugins/plugins';
         $lang = $path.'/template/langs/langs.php';
         $inits = array();
-        $url = get_bloginfo('url');
+        $url = site_url();
         if ($wp_rewrite->using_permalinks()) {
             $this->list_url = $url.'/mce_templates.js';
         } else {

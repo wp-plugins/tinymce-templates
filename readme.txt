@@ -3,8 +3,8 @@ Contributors: miyauchi
 Donate link: http://firegoby.theta.ne.jp/
 Tags: tinymce, Visual Editor, template
 Requires at least: 3.0
-Tested up to: 3.0
-Stable tag: 0.31
+Tested up to: 3.1
+Stable tag: 1.0.0
 
 TinyMCE Template plugin will enable to use HTML template on WordPress Visual Editor.
 You can edit and share this template with WordPress users.
@@ -38,7 +38,7 @@ You can send your own language pack to me.
 * A plug-in installation screen is displayed on the WordPress admin panel.
 * It installs it in `wp-content/plugins`.
 * The plug-in is made effective.
-* Open 'Template' menu. 
+* Open 'Template' menu.
 
 == Screenshots ==
 
