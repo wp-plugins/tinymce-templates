@@ -54,4 +54,5 @@ The author must acknowledge the thing that the operation guarantee and the suppo
 == Contact ==
 
 email to miya[at]theta.ne.jp
+twitter @miya001
 
