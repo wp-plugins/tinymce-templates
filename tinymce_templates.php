@@ -3,8 +3,8 @@
 Plugin Name: TinyMCE Templates
 Plugin URI: http://firegoby.theta.ne.jp/wp/tinymce_templates
 Description: Manage & Add Tiny MCE template.
-Author: Takayuki Miyauchi (THETA NETWORKS Co,.Ltd)
-Version: 1.1.2
+Author: Takayuki Miyauchi
+Version: 1.2.0
 Author URI: http://firegoby.theta.ne.jp/
 */
 
@@ -31,7 +31,6 @@ THE SOFTWARE.
 */
 
 define('TINYMCE_TEMPLATES_PLUGIN_URL', WP_PLUGIN_URL.'/'.dirname(plugin_basename(__FILE__)));
-define('TINYMCE_TEMPLATES_TABLE', $wpdb->prefix.'mce_template');
 define('TINYMCE_TEMPLATES_DOMAIN', 'tinymce_templates');
 
 require_once(dirname(__FILE__).'/includes/addrewriterules.class.php');
@@ -41,7 +40,7 @@ require_once(dirname(__FILE__).'/includes/MceTemplatesAdmin.class.php');
 
 $MceTemplates = new MceTemplates();
 register_activation_hook (__FILE__, array(&$MceTemplates, 'activation'));
-register_deactivation_hook (__FILE__, array(&$MceTemplates, 'deactivation'));
+//register_deactivation_hook (__FILE__, array(&$MceTemplates, 'deactivation'));
 
 class MceTemplates{
 
@@ -51,12 +50,38 @@ class MceTemplates{
     function __construct()
     {
         add_action('admin_menu', array(&$this, 'loadAdmin'));
+        add_action(
+            'admin_head-templates_page_addnewtemplates',
+            array(&$this, 'admin_head')
+        );
+        add_action(
+            'admin_head-toplevel_page_edittemplates',
+            array(&$this, 'admin_head')
+        );
+        add_filter('plugin_row_meta', array(&$this, 'plugin_row_meta'), 10, 2);
+    }
+
+    public function admin_head()
+    {
+        wp_enqueue_script( 'common' );
+        wp_enqueue_script( 'jquery-color' );
+        wp_print_scripts('editor');
+        if (function_exists('add_thickbox')) add_thickbox();
+            wp_print_scripts('media-upload');
+        if (function_exists('wp_tiny_mce')) wp_tiny_mce();
+            wp_admin_css();
+        wp_enqueue_script('utils');
+        do_action("admin_print_styles-post-php");
+        do_action('admin_print_styles');
+        $dir = WP_PLUGIN_URL.'/'.dirname(plugin_basename(__FILE__));
+        $html = '<link rel="stylesheet" href="%s/style.css" type="text/css" />';
+        printf($html, $dir);
     }
 
     public function activation()
     {
         global $wpdb;
-        $sql = "CREATE TABLE {$wpdb->prefix}mce_template (
+        $sql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}mce_template (
             `ID` varchar(32) NOT NULL,
             `name` varchar(50) NOT NULL,
             `desc` varchar(100) NOT NULL,
@@ -124,5 +149,15 @@ class MceTemplates{
         new MceTemplatesAdmin();
     }
 
+    public function plugin_row_meta($links, $file)
+    {
+        $pname = plugin_basename(__FILE__);
+        if ($pname === $file) {
+            $url = "https://www.paypal.com/";
+            $url .= "cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=K8BY3GVRHSCHY";
+            $links[] = sprintf('<a href="%s">Donate</a>', $url);
+        }
+        return $links;
+    }
 }
 ?>
