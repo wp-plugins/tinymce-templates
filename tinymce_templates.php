@@ -81,21 +81,24 @@ class MceTemplates{
     public function activation()
     {
         global $wpdb;
-        $sql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}mce_template (
-            `ID` varchar(32) NOT NULL,
-            `name` varchar(50) NOT NULL,
-            `desc` varchar(100) NOT NULL,
-            `html` text NOT NULL,
-            `share` tinyint(1) unsigned NOT NULL,
-            `author` bigint(20) unsigned NOT NULL,
-            `modified` timestamp NOT NULL,
-            UNIQUE KEY ID (`ID`))
-            ENGINE = MYISAM
-            CHARACTER SET utf8
-            COLLATE utf8_unicode_ci;
-        ";
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
+        $table = $wpdb->prefix.'mce_template';
+        if ($wpdb->get_var("show tables like '$table'") != $table) {
+            $sql = "CREATE TABLE ".$table." (
+                `ID` varchar(32) NOT NULL,
+                `name` varchar(50) NOT NULL,
+                `desc` varchar(100) NOT NULL,
+                `html` text NOT NULL,
+                `share` tinyint(1) unsigned NOT NULL,
+                `author` bigint(20) unsigned NOT NULL,
+                `modified` timestamp NOT NULL,
+                UNIQUE KEY ID (`ID`))
+                ENGINE = MYISAM
+                CHARACTER SET utf8
+                COLLATE utf8_unicode_ci;
+            ";
+            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+            dbDelta($sql);
+        }
     }
 
     public function deactivation()
