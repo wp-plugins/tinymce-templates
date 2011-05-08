@@ -4,7 +4,7 @@ Plugin Name: TinyMCE Templates
 Plugin URI: http://firegoby.theta.ne.jp/wp/tinymce_templates
 Description: Manage & Add Tiny MCE template.
 Author: Takayuki Miyauchi
-Version: 1.2.0
+Version: 1.2.1
 Author URI: http://firegoby.theta.ne.jp/
 */
 
@@ -50,21 +50,13 @@ class MceTemplates{
     function __construct()
     {
         add_action('admin_menu', array(&$this, 'loadAdmin'));
-        add_action(
-            'admin_head-templates_page_addnewtemplates',
-            array(&$this, 'admin_head')
-        );
-        add_action(
-            'admin_head-toplevel_page_edittemplates',
-            array(&$this, 'admin_head')
-        );
         add_filter('plugin_row_meta', array(&$this, 'plugin_row_meta'), 10, 2);
     }
 
     public function admin_head()
     {
-        wp_enqueue_script( 'common' );
-        wp_enqueue_script( 'jquery-color' );
+        wp_enqueue_script('common');
+        wp_enqueue_script('jquery-color');
         wp_print_scripts('editor');
         if (function_exists('add_thickbox')) add_thickbox();
             wp_print_scripts('media-upload');
@@ -117,7 +109,7 @@ class MceTemplates{
             dirname(plugin_basename(__FILE__)).'/langs'
         );
 
-        add_menu_page(
+        $this->edit_hook = add_menu_page(
             __('tinyMCE Templates', TINYMCE_TEMPLATES_DOMAIN),
             __('Templates', TINYMCE_TEMPLATES_DOMAIN),
             'edit_pages',
@@ -133,13 +125,21 @@ class MceTemplates{
             'edittemplates',
             array(&$this, 'adminPage')
         );
-        add_submenu_page(
+        $this->add_hook = add_submenu_page(
             'edittemplates',
             __('Add New Templates', TINYMCE_TEMPLATES_DOMAIN),
             __('Add New', TINYMCE_TEMPLATES_DOMAIN),
             'edit_pages',
             'addnewtemplates',
             array(&$this, 'adminPage')
+        );
+        add_action(
+            'admin_head-'.$this->edit_hook,
+            array(&$this, 'admin_head')
+        );
+        add_action(
+            'admin_head-'.$this->add_hook,
+            array(&$this, 'admin_head')
         );
     }
 
@@ -163,4 +163,5 @@ class MceTemplates{
         return $links;
     }
 }
+
 ?>
