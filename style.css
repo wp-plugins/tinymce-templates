@@ -35,10 +35,10 @@
 }
 
 #name,
-#desc,
-#html
+#desc
 {
     width: 100%;
+    font-size: 1.7em;
 }
 
 #desc
@@ -46,12 +46,8 @@
     height: 3em;
 }
 
-#html
-{
-    height: 10em;
-}
-
 #save
 {
     margin: 1em 0;
 }
+

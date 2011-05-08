@@ -79,18 +79,18 @@ class TinyMCETemplate{
             }
 
             if( isset($_GET['id']) && strlen($_GET['id']) ){
-                $sql = "select html from ".TINYMCE_TEMPLATES_TABLE."
+                $sql = "select html from ".$wpdb->prefix."mce_template
                     where (`ID`=%s) and (`author`={$current_user->ID} or `share`=1)
                         order by `modified` desc";
                 $sql = $wpdb->prepare($sql, $_GET['id']);
                 $template = $wpdb->get_var($sql);
                 if ($template) {
-                    echo stripslashes($template);
+                    echo wpautop(stripslashes($template));
                 }
                 exit;
             }
 
-            $sql = "select * from ".TINYMCE_TEMPLATES_TABLE."
+            $sql = "select * from ".$wpdb->prefix."mce_template
                 where `author`={$current_user->ID} or `share`=1
                     order by `modified` desc";
             $row = $wpdb->get_results($sql);
