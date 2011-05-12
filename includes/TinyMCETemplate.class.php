@@ -9,7 +9,7 @@ class TinyMCETemplate{
     function __construct()
     {
         new AddRewriteRules(
-            'mce_templates.js$',
+            'wp-admin/mce_templates.js$',
             'mce_templates',
             array(&$this, 'get_templates')
         );
@@ -49,7 +49,7 @@ class TinyMCETemplate{
         $inits = array();
         $url = home_url();
         if ($wp_rewrite->using_permalinks()) {
-            $this->list_url = $url.'/mce_templates.js';
+            $this->list_url = $url.'/wp-admin/mce_templates.js';
         } else {
             $this->list_url = $url.'/?mce_templates=1';
         }
@@ -67,32 +67,36 @@ class TinyMCETemplate{
 // return display templates as JSON
 //
     public function get_templates(){
-        global $wp_rewrite;
         if (get_query_var('mce_templates')) {
-            global $wpdb;
-            global $user_login;
-            global $current_user;
-            global $MceTemplates;
-
-            if (!$user_login) {
+            $u = wp_get_current_user();
+            if (!$u->ID) {
+                header("HTTP/1.1 404 Not Found");
+                echo "404 Not Found.";
                 exit;
             }
+            global $wp_rewrite;
+            global $wpdb;
 
             if( isset($_GET['id']) && strlen($_GET['id']) ){
                 $sql = "select html from ".$wpdb->prefix."mce_template
-                    where (`ID`=%s) and (`author`={$current_user->ID} or `share`=1)
+                    where (`ID`=%s) and (`author`=%d or `share`=1)
                         order by `modified` desc";
-                $sql = $wpdb->prepare($sql, $_GET['id']);
+                $sql = $wpdb->prepare($sql, $_GET['id'], $u->ID);
                 $template = $wpdb->get_var($sql);
                 if ($template) {
-                    echo wpautop(stripslashes($template));
+                    echo apply_filters(
+                        "tinymce_templates",
+                        wpautop(stripslashes($template)),
+                        stripslashes($template)
+                    );
                 }
                 exit;
             }
 
             $sql = "select * from ".$wpdb->prefix."mce_template
-                where `author`={$current_user->ID} or `share`=1
+                where `author`=%d or `share`=1
                     order by `modified` desc";
+            $sql = $wpdb->prepare($sql, $u->ID);
             $row = $wpdb->get_results($sql);
 
             header( 'Content-Type: application/x-javascript; charset=UTF-8' );
