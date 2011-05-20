@@ -162,6 +162,7 @@ class MceTemplatesAdmin{
         // new line by ANDREA BERSI
         echo "<div id='poststuff'>";
         echo "<div id=\"postdivrich\" class=\"postarea\">";
+        wp_tiny_mce();
         the_editor($html, "content", "desc", true, 3);
         echo "</div><!--end #postdivrich-->";
         echo "</div><!--end #poststuff-->";
