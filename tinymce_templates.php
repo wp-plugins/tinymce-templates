@@ -4,7 +4,7 @@ Plugin Name: TinyMCE Templates
 Plugin URI: http://firegoby.theta.ne.jp/wp/tinymce_templates
 Description: Manage & Add Tiny MCE template.
 Author: Takayuki Miyauchi
-Version: 1.4.1
+Version: 1.5.0
 Author URI: http://firegoby.theta.ne.jp/
 */
 
@@ -52,12 +52,23 @@ function __construct()
 
 public function admin_head()
 {
+    add_filter('tiny_mce_before_init', array(&$this, 'tiny_mce_before_init'), 999);
     wp_admin_css();
     do_action("admin_print_styles-post-php");
     do_action('admin_print_styles');
     $dir = WP_PLUGIN_URL.'/'.dirname(plugin_basename(__FILE__));
     $html = '<link rel="stylesheet" href="%s/style.css" type="text/css" />';
     printf($html, $dir);
+}
+
+public function tiny_mce_before_init($init)
+{
+    $init['plugins'] = str_replace(
+        array('wpfullscreen',',,'),
+        array('', ','),
+        $init['plugins']
+    );
+    return $init;
 }
 
 public function activation()
@@ -140,11 +151,14 @@ public function loadAdmin()
 }
 
 public function admin_scripts() {
+    global $wp_version;
     wp_enqueue_script('jquery-ui-tabs');
     wp_enqueue_script('editor');
     add_thickbox();
     wp_enqueue_script('media-upload');
-    add_action('admin_print_footer_scripts', 'wp_tiny_mce_preload_dialogs', 30);
+    if (version_compare($wp_version, '3.2', '<')) {
+        add_action('admin_print_footer_scripts', 'wp_tiny_mce_preload_dialogs', 30);
+    }
 }
 
 public function adminPage()
