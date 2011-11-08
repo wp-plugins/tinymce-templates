@@ -4,7 +4,7 @@ Plugin Name: TinyMCE Templates
 Plugin URI: http://firegoby.theta.ne.jp/wp/tinymce_templates
 Description: Manage & Add Tiny MCE template.
 Author: Takayuki Miyauchi
-Version: 1.4.1
+Version: 1.6.1
 Author URI: http://firegoby.theta.ne.jp/
 */
 
@@ -33,12 +33,13 @@ THE SOFTWARE.
 define('TINYMCE_TEMPLATES_PLUGIN_URL', WP_PLUGIN_URL.'/'.dirname(plugin_basename(__FILE__)));
 define('TINYMCE_TEMPLATES_DOMAIN', 'tinymce_templates');
 
-require_once(dirname(__FILE__).'/includes/addrewriterules.class.php');
+require_once(dirname(__FILE__).'/includes/class-addrewriterules.php');
 require_once(dirname(__FILE__).'/includes/mceplugins.class.php');
 require_once(dirname(__FILE__).'/includes/TinyMCETemplate.class.php');
 require_once(dirname(__FILE__).'/includes/MceTemplatesAdmin.class.php');
 
 $MceTemplates = new MceTemplates();
+register_activation_hook(__FILE__, 'flush_rewrite_rules');
 register_activation_hook (__FILE__, array(&$MceTemplates, 'activation'));
 //register_deactivation_hook (__FILE__, array(&$MceTemplates, 'deactivation'));
 
@@ -46,18 +47,32 @@ class MceTemplates{
 
 function __construct()
 {
+    if (!is_admin()) {
+        return;
+    }
     add_action('admin_menu', array(&$this, 'loadAdmin'));
     add_filter('plugin_row_meta', array(&$this, 'plugin_row_meta'), 10, 2);
 }
 
 public function admin_head()
 {
+    add_filter('tiny_mce_before_init', array(&$this, 'tiny_mce_before_init'), 999);
     wp_admin_css();
     do_action("admin_print_styles-post-php");
     do_action('admin_print_styles');
     $dir = WP_PLUGIN_URL.'/'.dirname(plugin_basename(__FILE__));
     $html = '<link rel="stylesheet" href="%s/style.css" type="text/css" />';
     printf($html, $dir);
+}
+
+public function tiny_mce_before_init($init)
+{
+    $init['plugins'] = str_replace(
+        array('wpfullscreen',',,'),
+        array('', ','),
+        $init['plugins']
+    );
+    return $init;
 }
 
 public function activation()
@@ -140,11 +155,14 @@ public function loadAdmin()
 }
 
 public function admin_scripts() {
+    global $wp_version;
     wp_enqueue_script('jquery-ui-tabs');
     wp_enqueue_script('editor');
     add_thickbox();
     wp_enqueue_script('media-upload');
-    add_action('admin_print_footer_scripts', 'wp_tiny_mce_preload_dialogs', 30);
+    if (version_compare($wp_version, '3.2', '<')) {
+        add_action('admin_print_footer_scripts', 'wp_tiny_mce_preload_dialogs', 30);
+    }
 }
 
 public function adminPage()
