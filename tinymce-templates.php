@@ -4,7 +4,7 @@ Plugin Name: TinyMCE Templates
 Plugin URI: http://firegoby.theta.ne.jp/wp/tinymce_templates
 Description: Manage & Add Tiny MCE template.
 Author: Takayuki Miyauchi
-Version: 2.0.0
+Version: 2.1.0
 Author URI: http://firegoby.theta.ne.jp/
 */
 
@@ -39,7 +39,7 @@ new tinymceTemplates();
 
 
 class tinymceTemplates {
-
+private $db_version  = '2';
 private $post_type   = 'tinymcetemplates';
 private $meta_param  = '_tinymcetemplates-share';
 private $table       = 'mce_template';
@@ -93,8 +93,12 @@ function __construct()
 
 public function activation()
 {
+    if (get_option("tinymce_templates_db_version") == $this->db_version) {
+        return;
+    }
+
     global $wpdb;
-    // do update function
+    update_option("tinymce_templates_db_version", $this->db_version);
     $sql = $wpdb->prepare('show tables like %s', $wpdb->prefix.$this->table);
     if ($wpdb->get_var($sql)) {
         $sql = "select * from ".mysql_real_escape_string($wpdb->prefix.$this->table);
@@ -154,6 +158,9 @@ public function admin_head(){
     if (get_post_type() === $this->post_type) {
         global $hook_suffix;
         if ($hook_suffix === 'post.php' || $hook_suffix === 'post-new.php') {
+            if (get_option("tinymce_templates_db_version") != $this->db_version) {
+                $this->activation();
+            }
             echo '<style>#visibility{display:none;}</style>';
         }
     }
