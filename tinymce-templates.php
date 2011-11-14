@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: TinyMCE Templates
-Plugin URI: http://firegoby.theta.ne.jp/wp/tinymce_templates
+Plugin URI: http://wpist.me/wp/tinymce-templates/
 Description: Manage & Add Tiny MCE template.
 Author: Takayuki Miyauchi
-Version: 2.1.0
-Author URI: http://firegoby.theta.ne.jp/
+Version: 2.3.0
+Author URI: http://wpist.me/
 */
 
 /*
@@ -47,7 +47,7 @@ private $base_url;
 private $translators = array(
     'Takayuki Miyauchi' => array(
         'lang' => 'Japanese',
-        'url'  => 'http://twitter.com/#!/miya0001',
+        'url'  => 'http://wpist.me/',
     ),
     'Andrea Bersi' => array(
         'lang' => 'Italian',
@@ -156,6 +156,9 @@ public function admin_head(){
         $inits
     );
     if (get_post_type() === $this->post_type) {
+        if (get_option("tinymce_templates_db_version") != $this->db_version) {
+            $this->activation();
+        }
         global $hook_suffix;
         if ($hook_suffix === 'post.php' || $hook_suffix === 'post-new.php') {
             if (get_option("tinymce_templates_db_version") != $this->db_version) {
@@ -181,8 +184,10 @@ public function save_post($id)
 
     $p = get_post($id);
     if ($p->post_type === $this->post_type) {
-        if (isset($_POST[$this->meta_param])) {
+        if (isset($_POST[$this->meta_param]) && $_POST[$this->meta_param]) {
             update_post_meta($id, $this->meta_param, 1);
+        } else {
+            delete_post_meta($id, $this->meta_param);
         }
     }
 }
@@ -325,6 +330,7 @@ public function get_templates(){
             'post_type'   => $this->post_type,
             'orderby'     => 'date',
             'order'       => 'DESC',
+            'numberposts' => -1,
         );
         $posts = get_posts($p);
         echo 'var tinyMCETemplateList = [';
