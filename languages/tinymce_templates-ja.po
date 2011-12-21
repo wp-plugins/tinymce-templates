@@ -7,63 +7,104 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-11 20:30+0900\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/tinymce-templates\n"
+"POT-Creation-Date: 2011-11-18 17:15:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../tinymce-templates.php:157 ../tinymce-templates.php:159
+#: tinymce-templates.php:179 tinymce-templates.php:317
+#: tinymce-templates.php:319
+msgid "Shared"
+msgstr "共有"
+
+#: tinymce-templates.php:212 tinymce-templates.php:214
 msgid "Templates"
 msgstr "テンプレート"
 
-#: ../tinymce-templates.php:160
+#: tinymce-templates.php:215
 msgid "Add New Template"
 msgstr "テンプレートの新規登録"
 
-#: ../tinymce-templates.php:161
+#: tinymce-templates.php:216
 msgid "Edit Template"
 msgstr "テンプレートを編集"
 
-#: ../tinymce-templates.php:162
+#: tinymce-templates.php:217
 msgid "Add New"
 msgstr "新規追加"
 
-#: ../tinymce-templates.php:163
+#: tinymce-templates.php:218
 msgid "New Template"
 msgstr "新しいテンプレート"
 
-#: ../tinymce-templates.php:164
+#: tinymce-templates.php:219
 msgid "View Template"
 msgstr "テンプレートを表示"
 
-#: ../tinymce-templates.php:165
+#: tinymce-templates.php:220
 msgid "No templatess found."
 msgstr "テンプレートが見つかりませんでした。"
 
-#: ../tinymce-templates.php:167
+#: tinymce-templates.php:221
 msgid "No templates found in Trash."
 msgstr "ゴミ箱内にテンプレートが見つかりませんでした。"
 
-#: ../tinymce-templates.php:170
+#: tinymce-templates.php:225
 msgid "Search Templates"
 msgstr "テンプレートを検索"
 
-#: ../tinymce-templates.php:198
+#: tinymce-templates.php:253
 msgid "Share"
 msgstr "共有"
 
-#: ../tinymce-templates.php:210
+#: tinymce-templates.php:262
+msgid "Translators"
+msgstr "翻訳者"
+
+#: tinymce-templates.php:271
+msgid "Donate"
+msgstr "寄付"
+
+#: tinymce-templates.php:286
+msgid ""
+"It is hard to continue development and support for WordPress plugins without "
+"contributions from users like you."
+msgstr ""
+"このプラグインの開発やメンテナンスを継続するにはみなさんのサポートが必要で"
+"す。"
+
+#: tinymce-templates.php:315
 msgid "Private"
 msgstr "個人"
 
-#: ../tinymce-templates.php:212 ../tinymce-templates.php:214
-msgid "Shared"
-msgstr "共有"
+#. Plugin Name of the plugin/theme
+msgid "TinyMCE Templates"
+msgstr "TinyMCE Templates"
+
+#. Plugin URI of the plugin/theme
+msgid "http://wpist.me/wp/tinymce-templates/"
+msgstr "http://firegoby.theta.ne.jp/wp/tinymce_templates"
+
+#. Description of the plugin/theme
+msgid ""
+"TinyMCE Templates plugin will enable to use HTML template on WordPress "
+"Visual Editor."
+msgstr ""
+"WordPressのビジュアルエディターでテンプレートを利用できるようにするためのプラ"
+"グインです。"
+
+#. Author of the plugin/theme
+msgid "Takayuki Miyauchi"
+msgstr "Takayuki Miyauchi"
+
+#. Author URI of the plugin/theme
+msgid "http://wpist.me/"
+msgstr "http://firegoby.theta.ne.jp/"
 
 #~ msgid "Templates permanently deleted."
 #~ msgstr "テンプレートを削除しました。"
@@ -94,9 +135,6 @@ msgstr "共有"
 
 #~ msgid "Template Contents"
 #~ msgstr "テンプレート"
-
-#~ msgid "tinyMCE Templates"
-#~ msgstr "テンプレートを編集"
 
 #~ msgid "Edit"
 #~ msgstr "編集"
