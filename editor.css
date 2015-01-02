@@ -1,8 +1,7 @@
-table {
+body#tinymce.wp-editor table {
     border: 1px dashed #cccccc;
 }
 
-th,td {
+body#tinymce.wp-editor th,td {
     border: 1px dashed #cccccc;
 }
-
