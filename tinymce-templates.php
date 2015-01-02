@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: TinyMCE Templates
-Plugin URI: http://wpist.me/wp/tinymce-templates/
+Plugin URI: https://github.com/miya0001/tinymce-templates
 Description: TinyMCE Templates plugin will enable to use HTML template on WordPress Visual Editor.
 Author: Takayuki Miyauchi
-Version: 3.4.5
-Author URI: http://wpist.me/
+Version: 4.0.0
+Author URI: https://github.com/miya0001/
 Domain Path: /languages
 Text Domain: tinymce_templates
 */
@@ -32,513 +32,515 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-require_once(dirname(__FILE__).'/includes/mceplugins.class.php');
-
 $tinymce_templates = new tinymceTemplates();
 $tinymce_templates->register();
 
 class tinymceTemplates {
 
-private $version     = '2.9.0';
-private $db_version  = '2';
-private $post_type   = 'tinymcetemplates';
-private $meta_param  = '_tinymcetemplates-share';
-private $table       = 'mce_template';
-private $base_url;
-private $translators = array(
-    'Takayuki Miyauchi' => array(
-        'lang' => 'Japanese',
-        'url'  => 'http://wpist.me/',
-    ),
-    'Andrea Bersi' => array(
-        'lang' => 'Italian',
-        'url'  => 'http://www.andreabersi.com/',
-    ),
-    'Tobias Bergius' => array(
-        'lang' => 'Swedish',
-        'url'  => '',
-    ),
-    'Martin Lettner' => array(
-        'lang' => 'German',
-        'url'  => 'http://www.martinlettner.info/',
-    ),
-    'David Bravo' => array(
-        'lang' => 'Spanish',
-        'url'  => 'http://www.dimensionmultimedia.com/',
-    ),
-    'Frank Groeneveld' => array(
-        'lang' => 'Dutch',
-        'url'  => 'http://ivaldi.nl/',
-    ),
-    'HAROUY Jean-Michel' => array(
-        'lang' => 'French',
-        'url'  => 'http://www.laposte.net/',
-    ),
-    'Rafael Funchal' => array(
-        'lang' => 'Brazilian Portuguese',
-        'url'  => 'http://www.rafaelfunchal.com.br/',
-    ),
-    'Morten Elm' => array(
-        'lang' => 'Filipino',
-        'url'  => 'http://www.storbyfan.dk/',
-    ),
-    'ihtimir' => array(
-        'lang' => 'Russian',
-        'url'  => '',
-    ),
-    'Branco' => array(
-        'lang' => 'Slovak',
-        'url'  => 'http://webhostinggeeks.com/user-reviews/',
-    ),
-);
+	private $version     = '2.9.0';
+	private $post_type   = 'tinymcetemplates';
+	private $table       = 'mce_template';
+	private $base_url;
+	private $translators = array(
+		'Takayuki Miyauchi' => array(
+			'lang' => 'Japanese',
+			'url'  => 'http://wpist.me/',
+		),
+		'Andrea Bersi' => array(
+			'lang' => 'Italian',
+			'url'  => 'http://www.andreabersi.com/',
+		),
+		'Tobias Bergius' => array(
+			'lang' => 'Swedish',
+			'url'  => '',
+		),
+		'Martin Lettner' => array(
+			'lang' => 'German',
+			'url'  => 'http://www.martinlettner.info/',
+		),
+		'David Bravo' => array(
+			'lang' => 'Spanish',
+			'url'  => 'http://www.dimensionmultimedia.com/',
+		),
+		'Frank Groeneveld' => array(
+			'lang' => 'Dutch',
+			'url'  => 'http://ivaldi.nl/',
+		),
+		'HAROUY Jean-Michel' => array(
+			'lang' => 'French',
+			'url'  => 'http://www.laposte.net/',
+		),
+		'Rafael Funchal' => array(
+			'lang' => 'Brazilian Portuguese',
+			'url'  => 'http://www.rafaelfunchal.com.br/',
+		),
+		'Morten Elm' => array(
+			'lang' => 'Filipino',
+			'url'  => 'http://www.storbyfan.dk/',
+		),
+		'ihtimir' => array(
+			'lang' => 'Russian',
+			'url'  => '',
+		),
+		'Branco' => array(
+			'lang' => 'Slovak',
+			'url'  => 'http://webhostinggeeks.com/user-reviews/',
+		),
+	);
 
-public function register()
-{
-    $this->base_url = plugins_url(dirname(plugin_basename(__FILE__)));
-    register_activation_hook(__FILE__, array($this, 'activation'));
-    add_action('plugins_loaded', array($this, 'plugins_loaded'));
-    add_action('save_post', array($this, 'save_post'));
-    add_filter('mce_css', array($this, 'mce_css'));
-    add_action('admin_head', array($this, 'admin_head'));
-    add_action('admin_footer-post-new.php', array($this, 'admin_footer'));
-    add_action('wp_ajax_tinymce_templates', array($this, 'wp_ajax'));
-    add_action('post_submitbox_start', array($this, 'post_submitbox_start'));
-    add_filter('post_row_actions', array($this, 'row_actions'),10,2);
-    add_filter('page_row_actions', array($this, 'row_actions'),10,2);
-    add_filter('parse_query', array($this, 'parse_query'));
+	/**
+	 * Initializing the plugin.
+	 *
+	 * @param  none
+	 * @return none
+	 */
+	public function register()
+	{
+		$this->base_url = plugins_url( dirname( plugin_basename( __FILE__ ) ) );
+		add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ) );
+	}
 
-    global $wp_version;
-    if (!(version_compare($wp_version, "3.9") < 0)) {
-        add_filter('wp_mce_translation', array($this, 'wp_mce_translation'));
-    }
+	/**
+	 * Fires on plugins_loaded hook.
+	 *
+	 * @param  none
+	 * @return none
+	 */
+	public function plugins_loaded()
+	{
+		load_plugin_textdomain(
+			'tinymce_templates',
+			false,
+			dirname(plugin_basename(__FILE__)).'/languages'
+		);
 
-    add_action(
-        'wp_before_admin_bar_render',
-        array($this, 'wp_before_admin_bar_render')
-    );
-}
+		$this->register_post_type();
 
-public function wp_before_admin_bar_render() {
-    global $wp_admin_bar;
-    if (is_single() || is_page()) {
-        $wp_admin_bar->add_menu(array(
-            'parent' => 'edit',
-            'id' => 'new_template',
-            'title' => __('Copy to a new template', 'tinymce_templates'),
-            'href' => $this->get_copy_template_url(get_the_ID())
-        ));
-    }
-}
+		add_filter( 'post_row_actions', array( $this, 'row_actions' ), 10, 2 );
+		add_filter( 'page_row_actions', array( $this, 'row_actions' ), 10, 2 );
+		add_filter( 'wp_mce_translation', array( $this, 'wp_mce_translation' ) );
 
-public function wp_mce_translation($mce_translation)
-{
-    $mce_translation['Insert template'] = __("Insert template", "tinymce_templates");
-    $mce_translation['Templates'] = __("Templates", "tinymce_templates");
-    $mce_translation['No templates defined'] = __("No templates defined", "tinymce_templates");
+		add_action( 'admin_head', array( $this, 'admin_head' ) );
+		add_action( 'admin_footer-post-new.php', array( $this, 'admin_footer' ) );
+		add_action( 'wp_ajax_tinymce_templates', array( $this, 'wp_ajax' ) );
+		add_action( 'post_submitbox_start', array( $this, 'post_submitbox_start' ) );
+		add_action( 'wp_before_admin_bar_render', array( $this, 'wp_before_admin_bar_render' ) );
+		add_action( 'save_post', array( $this, 'save_post' ) );
 
-    return $mce_translation;
-}
+		add_shortcode( 'template', array( $this, 'template_shortcode' ) );
+	}
 
-public function row_actions($actions, $post)
-{
-    $actions['copy_to_template'] = sprintf(
-        '<a href="%s">%s</a>',
-        $this->get_copy_template_url($post->ID),
-        __('Copy to a new template', 'tinymce_templates')
-    );
-    return $actions;
-}
+	/**
+	 * Shortcode for templates.
+	 *
+	 * @param  array $p Shortcode parameters.
+	 * @return none  Shortcode output.
+	 */
+	public function template_shortcode( $p )
+	{
+		if ( isset( $p['id'] ) && $p['id'] ) {
+			$post = get_post( $p['id'] );
+			return apply_filters( 'the_content', $post->post_content );
+		}
+	}
 
-public function post_submitbox_start()
-{
-    if (isset($_GET['post']) && intval($_GET['post'])) {
-?>
-<div id="duplicate-action">
-    <a class="submitduplicate duplication"
-        href="<?php echo $this->get_copy_template_url($_GET['post']) ?>"><?php _e('Copy to a new template', 'tinymce_templates'); ?></a>
-</div>
-<?php
-    }
-}
+	/**
+	 * Fires on wp_before_admin_bar_render hook.
+	 *
+	 * @param  none
+	 * @return none
+	 */
+	public function wp_before_admin_bar_render() {
+		global $wp_admin_bar;
+		if ( is_single() || is_page() ) {
+			/*
+			 * Adding menu to the admin bar.
+			 */
+			$wp_admin_bar->add_menu( array(
+				'parent' => 'edit',
+				'id' => 'new_template',
+				'title' => __( 'Copy to a new template', 'tinymce_templates' ),
+				'href' => $this->get_copy_template_url( get_the_ID() )
+			) );
+		}
+	}
 
-public function activation()
-{
-    if (get_option("tinymce_templates_db_version") == $this->db_version) {
-        return;
-    }
+	/**
+	 * Translates tinymce plugin.
+	 *
+	 * @param  array $mce_translation Translates of the tinymce.
+	 * @return array Translates of the tinymce templates plugin.
+	 */
+	public function wp_mce_translation( $mce_translation )
+	{
+		$mce_translation['Insert template'] = __( "Insert template", "tinymce_templates" );
+		$mce_translation['Templates'] = __( "Templates", "tinymce_templates" );
+		$mce_translation['No templates defined'] = __( "No templates defined", "tinymce_templates" );
+		$mce_translation['Note: The template will be inserted as shortcode.'] = __( "Note: The template will be inserted as shortcode.", "tinymce_templates" );
 
-    global $wpdb;
-    update_option("tinymce_templates_db_version", $this->db_version);
-    $sql = $wpdb->prepare('show tables like %s', $wpdb->prefix.$this->table);
-    if ($wpdb->get_var($sql)) {
-        $sql = "select * from ".mysql_real_escape_string($wpdb->prefix.$this->table);
-        $res = $wpdb->get_results($sql);
-        foreach ($res as $tpl) {
-            $post = array();
-            $post['post_title']   = $tpl->name;
-            $post['post_content'] = $tpl->html;
-            $post['post_excerpt'] = $tpl->desc;
-            $post['post_author']  = $tpl->author;
-            $post['post_date']    = $tpl->modified;
-            $post['post_type']    = $this->post_type;
-            $post['post_status']    = 'publish';
-            $id = wp_insert_post($post);
-            if ($id) {
-                update_post_meta($id, $this->meta_param, $tpl->share);
-            }
-        }
-        $sql = 'drop table '.$wpdb->prefix.$this->table;
-        $wpdb->query($sql);
-    }
-}
+		return $mce_translation;
+	}
 
-public function plugins_loaded()
-{
-    load_plugin_textdomain(
-        'tinymce_templates',
-        false,
-        dirname(plugin_basename(__FILE__)).'/languages'
-    );
-    $this->addCustomPostType();
-}
+	/**
+	 * Filters the pages/posts list menu in admin.
+	 *
+	 * @param  array  $actions Menu items of the pages/posts list.
+	 * @param  object $post Current post object.
+	 * @return array  Menu items.
+	 */
+	public function row_actions( $actions, $post )
+	{
+		$actions['copy_to_template'] = sprintf(
+			'<a href="%s">%s</a>',
+			$this->get_copy_template_url( $post->ID ),
+			__( 'Copy to a new template', 'tinymce_templates' )
+		);
+		return $actions;
+	}
 
-private function fixed_role_issue()
-{
-    global $wp_roles;
-    $roles = array('administrator', 'editor');
-    foreach ($roles as $r) {
-        $wp_roles->add_cap($r, "edit_others_posts");
-    }
-}
+	/**
+	 * Adding copy to temsplate link to post submit box.
+	 *
+	 * @param  none
+	 * @return none
+	 */
+	public function post_submitbox_start()
+	{
+		if ( isset( $_GET['post'] ) && intval( $_GET['post'] ) ) {
+		?>
+			<div id="duplicate-action">
+				<a class="submitduplicate duplication"
+					href="<?php echo $this->get_copy_template_url($_GET['post']) ?>"><?php _e('Copy to a new template', 'tinymce_templates'); ?></a>
+			</div>
+		<?php
+		}
+	}
 
-public function mce_css($css)
-{
-    $files   = preg_split("/,/", $css);
-    $files[] = $this->base_url.'/editor.css';
-    $files   = array_map('trim', $files);
-    return join(",", $files);
-}
+	/**
+	 * Fires on admin_head hook.
+	 *
+	 * @param  none
+	 * @return none
+	 */
+	public function admin_head()
+	{
+		/**
+		 * Load and setup tinymce plugin.
+		 */
+		$url	= admin_url( 'admin-ajax.php' );
+		$nonce  = wp_create_nonce( "tinymce_templates" );
 
-public function admin_head(){
-    if (version_compare($this->version, get_option('tinymcetemplates-version', 0))) {
-        // bug recovery for 2.8.0
-        $this->fixed_role_issue();
-        update_option("tinymcetemplates-version", $this->version);
-    }
+		$args = array(
+			'action' => 'tinymce_templates',
+			'nonce'  => $nonce,
+		);
 
-    global $wp_version;
-    if (version_compare($wp_version, "3.9", '<')) {
-        $plugin = $this->base_url.'/mce_plugins/3.5/plugins/template/editor_plugin.js';
-    } else {
-        $plugin = $this->base_url.'/mce_plugins/4.0/plugins/template/plugin.min.js';
-    }
+		$url = add_query_arg( $args, $url);
 
-    $url    = admin_url('admin-ajax.php');
-    $url    = add_query_arg('action', 'tinymce_templates', $url);
-    $url    = add_query_arg('action', 'tinymce_templates', $url);
-    $nonce  = wp_create_nonce("tinymce_templates");
-    $url    = add_query_arg('nonce', $nonce, $url);
+		$inits['templates'] = $url;
 
-    if (version_compare($wp_version, "3.9", '<')) {
-        $inits['template_external_list_url'] = $url;
-    } else {
-        $inits['templates'] = $url;
-    }
+		require_once( dirname(__FILE__) . '/includes/mceplugins.class.php' );
 
-    new tinymcePlugins(
-        'template',
-        $plugin,
-        array($this, 'addButton'),
-        $inits
-    );
+		new tinymcePlugins(
+			'template',
+			$this->base_url.'/mce_plugins/4.0/plugins/template/plugin.js',
+			array( $this, 'tinymce_add_button' ),
+			$inits
+		);
 
-    echo '<style type="text/css">';
-    printf(
-        'span.mceIcon.mce_template{background-image: url(%s) !important; background-position: center center !important;background-repeat: no-repeat;}',
-        plugins_url('mce_plugins/3.5/plugins/template/img/icon.png', __FILE__)
-    );
-    echo '</style>';
+		/**
+		 * Setup admin menu icon
+		 */
+		echo '<style type="text/css">';
+		printf(
+			'span.mceIcon.mce_template{background-image: url(%s) !important; background-position: center center !important;background-repeat: no-repeat;}',
+			plugins_url('mce_plugins/3.5/plugins/template/img/icon.png', __FILE__)
+		);
+		echo '</style>';
 
-    if (get_post_type() === $this->post_type) {
-        if (get_option("tinymce_templates_db_version") != $this->db_version) {
-            $this->activation();
-        }
-        global $hook_suffix;
-        if ($hook_suffix === 'post.php' || $hook_suffix === 'post-new.php') {
-            remove_meta_box('slugdiv', $this->post_type, 'normal');
-            if (get_option("tinymce_templates_db_version") != $this->db_version) {
-                $this->activation();
-            }
-            echo '<style>#visibility{display:none;}</style>';
-        } elseif ($hook_suffix === 'edit.php') {
-            add_filter("display_post_states", array($this, "display_post_states"));
-        }
-    }
-}
+		/**
+		 * Hide some stuff in the templates editor panel.
+		 */
+		if ( get_post_type() === $this->post_type ) {
+			global $hook_suffix;
+			if ( $hook_suffix === 'post.php' || $hook_suffix === 'post-new.php' ) {
+				remove_meta_box( 'slugdiv', $this->post_type, 'normal' );
+				echo '<style>#visibility{display:none;} #message a{display: none;}</style>';
+			}
+		}
 
-public function display_post_states($stat)
-{
-    $share = get_post_meta(get_the_ID(), $this->meta_param, true);
-    if ($share) {
-        $stat[] = __('Shared', 'tinymce_templates', 'tinymce_templates');
-    }
-    return $stat;
-}
+		/**
+		 * Add editor style to the editor.
+		 */
+		add_editor_style( plugins_url( 'editor.css', __FILE__ ) );
+	}
 
-public function save_post($id)
-{
-    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
-        return $id;
+	/**
+	 * Add `Template` button to the editor.
+	 *
+	 * @param  none
+	 * @return none
+	 */
+	public function tinymce_add_button( $buttons = array() )
+	{
+		array_unshift( $buttons, '|' );
+		array_unshift( $buttons, 'template' );
+		return $buttons;
+	}
 
-    if (isset($_POST['action']) && $_POST['action'] == 'inline-save')
-        return $id;
+	/**
+	 * Register custom post type.
+	 *
+	 * @param  none
+	 * @return none
+	 */
+	private function register_post_type()
+	{
+		$args = array(
+			'label' => __( 'Templates', 'tinymce_templates' ),
+			'labels' => array(
+				'singular_name' => __( 'Templates', 'tinymce_templates' ),
+				'add_new_item' => __( 'Add New Template', 'tinymce_templates' ),
+				'edit_item' => __( 'Edit Template', 'tinymce_templates' ),
+				'add_new' => __( 'Add New', 'tinymce_templates' ),
+				'new_item' => __( 'New Template', 'tinymce_templates' ),
+				'view_item' => __( 'View Template', 'tinymce_templates' ),
+				'not_found' => __( 'No templatess found.', 'tinymce_templates' ),
+				'not_found_in_trash' => __(
+					'No templates found in Trash.',
+					'tinymce_templates'
+				),
+				'search_items' => __('Search Templates', 'tinymce_templates'),
+			),
+			'public' => false,
+			'publicly_queryable' => false,
+			'exclude_from_search' => true,
+			'show_ui' => true,
+			'capability_type' => 'post',
+			'hierarchical' => false,
+			'menu_position' => 100,
+			'rewrite' => false,
+			'show_in_nav_menus' => false,
+			'register_meta_box_cb' => array( $this, 'add_meta_box' ),
+			'supports' => array(
+				'title',
+				'editor',
+				'excerpt',
+				'revisions',
+				'author',
+			)
+		);
+		register_post_type( $this->post_type, $args );
+	}
 
-    $p = get_post($id);
-    if ($p->post_type === $this->post_type) {
-        $me = wp_get_current_user();
-        if ($p->post_author != $me->ID) {
-            wp_die('Permission denied.');
-        }
-        if (isset($_POST[$this->meta_param]) && $_POST[$this->meta_param]) {
-            update_post_meta($id, $this->meta_param, 1);
-        } else {
-            delete_post_meta($id, $this->meta_param);
-        }
-    }
-}
+	/**
+	 * Adding meta box callback function.
+	 *
+	 * @param  none
+	 * @return none
+	 */
+	public function add_meta_box()
+	{
+		add_meta_box(
+			'tinymce_templates-is-shortcode',
+			__('Insert as Shortcode', 'tinymce_templates'),
+			array($this, 'insert_as_shortcode_meta_box'),
+			$this->post_type,
+			'side',
+			'low'
+		);
 
-public function addButton($buttons = array())
-{
-    array_unshift($buttons, '|');
-    array_unshift($buttons, 'template');
-    return $buttons;
-}
+		add_meta_box(
+			'tinymce_templates-translators',
+			__( 'Translators', 'tinymce_templates' ),
+			array( $this, 'translators_meta_box' ),
+			$this->post_type,
+			'side',
+			'low'
+		);
+	}
 
-private function addCustomPostType()
-{
-    $args = array(
-        'label' => __('Templates', 'tinymce_templates'),
-        'labels' => array(
-            'singular_name' => __('Templates', 'tinymce_templates'),
-            'add_new_item' => __('Add New Template', 'tinymce_templates'),
-            'edit_item' => __('Edit Template', 'tinymce_templates'),
-            'add_new' => __('Add New', 'tinymce_templates'),
-            'new_item' => __('New Template', 'tinymce_templates'),
-            'view_item' => __('View Template', 'tinymce_templates'),
-            'not_found' => __('No templatess found.', 'tinymce_templates'),
-            'not_found_in_trash' => __(
-                'No templates found in Trash.',
-                'tinymce_templates'
-            ),
-            'search_items' => __('Search Templates', 'tinymce_templates'),
-        ),
-        'public' => false,
-        'publicly_queryable' => false,
-        'exclude_from_search' => true,
-        'show_ui' => true,
-        'capability_type' => 'post',
-        'hierarchical' => false,
-        'menu_position' => 100,
-        'rewrite' => false,
-        'show_in_nav_menus' => false,
-        'register_meta_box_cb' => array($this, 'addMetaBox'),
-        'supports' => array(
-            'title',
-            'editor',
-            'excerpt',
-            'revisions',
-            'author',
-        )
-    );
-    register_post_type($this->post_type, $args);
-}
+	/**
+	 * Adding meta box `Insert as shortcode`.
+	 *
+	 * @param  none
+	 * @return none
+	 */
+	public function insert_as_shortcode_meta_box( $post, $box )
+	{
+		$res = get_post_meta($post->ID, 'insert_as_shortcode', true);
+		if ( $res ) {
+			echo '<label><input type="radio" name="is_shortcode" value="1" checked> '.__( 'Yes' ).'</label><br />';
+			echo '<label><input type="radio" name="is_shortcode" value="0"> '.__( 'No' ).'</label>';
+		} else {
+			echo '<label><input type="radio" name="is_shortcode" value="1"> '.__( 'Yes' ).'</label><br />';
+			echo '<label><input type="radio" name="is_shortcode" value="0" checked> '.__( 'No' ).'</label>';
+		}
+	}
 
-public function addMetaBox()
-{
-    add_meta_box(
-        'tinymce_templates-share',
-        __('Share', 'tinymce_templates'),
-        array($this, 'sharedMetaBox'),
-        $this->post_type,
-        'side',
-        'low'
-    );
+	/**
+	 * Adding meta box `Translators`.
+	 *
+	 * @param  none
+	 * @return none
+	 */
+	public function translators_meta_box( $post, $box )
+	{
+		echo '<ul>';
+		foreach ( $this->translators as $u => $p ) {
+			if ( $p['url'] ) {
+				printf(
+					'<li><a href="%s">%s</a> ( %s )</li>',
+					esc_attr( $p['url'] ),
+					esc_html( $u ),
+					esc_html( $p['lang'] )
+				);
+			} else {
+				printf(
+					'<li>%s ( %s )</li>',
+					esc_html( $u ),
+					esc_html( $p['lang'] )
+				);
+			}
+		}
+		echo '</ul>';
+	}
 
-    add_meta_box(
-        'tinymce_templates-translators',
-        __('Translators', 'tinymce_templates'),
-        array($this, 'translatorsMetaBox'),
-        $this->post_type,
-        'side',
-        'low'
-    );
+	/**
+	 * Saving post meta to template post type.
+	 *
+	 * @param  int $id The ID of the post.
+	 * @return none
+	 */
+	public function save_post( $id )
+	{
+		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+			return $id;
+		}
 
-    add_meta_box(
-        'tinymce_templates-donate',
-        'High Performance WordPress Hosting',
-        array($this, 'amimoto_metabox'),
-        $this->post_type,
-        'side',
-        'low'
-    );
-}
+		if (isset($_POST['action']) && $_POST['action'] == 'inline-save') {
+			return $id;
+		}
 
-public function amimoto_metabox($post, $box)
-{
-    echo '<p>';
-    echo '<a href="http://megumi-cloud.com/">';
-    echo '<img src="'.$this->base_url.'/img/amimoto.png" style="display: block;margin: 0 auto;max-width: 100%;">';
-    echo '</a>';
-    echo '</p>';
-}
+		$p = get_post($id);
 
-public function translatorsMetaBox($post, $box)
-{
-    echo '<ul>';
-    foreach ($this->translators as $u => $p) {
-        if ($p['url']) {
-            printf(
-                '<li><a href="%s">%s</a> (%s)</li>',
-                esc_attr($p['url']),
-                esc_html($u),
-                esc_html($p['lang'])
-            );
-        } else {
-            printf(
-                '<li>%s (%s)</li>',
-                esc_html($u),
-                esc_html($p['lang'])
-            );
-        }
-    }
-    echo '</ul>';
-}
+		/**
+		 * Save post_meta
+		 */
+		if ($p->post_type === $this->post_type) {
+			if ( isset( $_POST['is_shortcode'] ) && $_POST['is_shortcode'] ) {
+				update_post_meta( $id, 'insert_as_shortcode', 1 );
+			} else {
+				delete_post_meta( $id, 'insert_as_shortcode' );
+			}
+		}
+	}
 
-public function sharedMetaBox($post, $box)
-{
-    $share = get_post_meta($post->ID, $this->meta_param, true);
-    echo '<select name="'.$this->meta_param.'">';
-    echo '<option value="0">'.__('Private', 'tinymce_templates').'</option>';
-    if ($share) {
-        echo '<option value="1" selected="selected">'.__('Shared', 'tinymce_templates').'</option>';
-    } else {
-        echo '<option value="1">'.__('Shared', 'tinymce_templates').'</option>';
-    }
-    echo '</select>';
-}
-
-public function admin_footer()
-{
-    if (get_post_type() === $this->post_type) {
-        if (isset($_GET['origin']) && intval($_GET['origin'])) {
-            $origin = get_post(intval($_GET['origin']));
-            if ($origin) {
-                $template = array(
-                    'post_title' => $origin->post_title,
-                    'post_content' => wpautop($origin->post_content),
-                );
-                $template = json_encode($template);
-                echo <<<EOL
+	/**
+	 * Generate javascript for the copying to the template.
+	 *
+	 * @param  none
+	 * @return none
+	 */
+	public function admin_footer()
+	{
+		if ( get_post_type() === $this->post_type ) {
+			if ( isset($_GET['origin']) && intval($_GET['origin']) ) {
+				$origin = get_post( intval($_GET['origin']) );
+				if ( $origin ) {
+					$template = array(
+						'post_title' => $origin->post_title,
+						'post_content' => wpautop( $origin->post_content ),
+					);
+					$template = json_encode( $template );
+					echo <<<EOL
 <script type="text/javascript">
-var origin = {$template};
-jQuery('#title').val(origin.post_title);
-jQuery('#content').val(origin.post_content);
+	var origin = {$template};
+	jQuery( '#title').val(origin.post_title );
+	jQuery( '#content').val(origin.post_content );
 </script>
 EOL;
-            }
-        }
-    }
-}
+				}
+			}
+		}
+	}
 
-public function wp_ajax()
-{
-    global $wp_version;
+	/**
+	 * Output json of the templates.
+	 *
+	 * @param  none
+	 * @return none
+	 */
+	public function wp_ajax()
+	{
+		nocache_headers();
 
-    nocache_headers();
-    if (!wp_verify_nonce($_GET['nonce'], 'tinymce_templates')) {
-        return;
-    }
-    $u = wp_get_current_user();
-    header( 'Content-Type: application/javascript; charset=UTF-8' );
-    if (isset($_GET['template_id']) && intval($_GET['template_id'])) {
-        $p = get_post($_GET['template_id']);
-        if ($p->post_status === 'publish') {
-            if (intval($u->ID) && (intval($u->ID) === intval($p->post_author))) {
-                echo apply_filters(
-                    "tinymce_templates",
-                    wpautop($p->post_content),
-                    stripslashes($p->post_content)
-                );
-            } else {
-                $share = get_post_meta($p->ID, $this->meta_param, true);
-                if ($share || current_user_can('administrator')) {
-                    echo apply_filters(
-                        "tinymce_templates",
-                        wpautop($p->post_content),
-                        stripslashes($p->post_content)
-                    );
-                }
-            }
-        }
-        exit;
-    }
-    $p = array(
-        'post_status' => 'publish',
-        'post_type'   => $this->post_type,
-        'orderby'     => 'date',
-        'order'       => 'DESC',
-        'numberposts' => -1,
-    );
-    $posts = get_posts($p);
+		if ( ! wp_verify_nonce($_GET['nonce'], 'tinymce_templates') ) {
+			return;
+		}
 
-    $url    = admin_url('admin-ajax.php');
-    $url    = add_query_arg('action', 'tinymce_templates', $url);
-    $nonce  = wp_create_nonce("tinymce_templates");
-    $url    = add_query_arg('nonce', $nonce, $url);
+		header( 'Content-Type: application/javascript; charset=UTF-8' );
 
-    $arr = array();
-    foreach ($posts as $p) {
-        if (intval($u->ID) && (intval($u->ID) !== intval($p->post_author))) {
-            $share = get_post_meta($p->ID, $this->meta_param, true);
-            if (!$share && !current_user_can('administrator')) {
-                continue;
-            }
-        }
-        $ID = intval($p->ID);
-        $name = esc_html(apply_filters('tinymce_template_title', $p->post_title));
-        $desc = esc_html(apply_filters('tinymce_template_excerpt', $p->post_excerpt));
-        $url  = add_query_arg('template_id', $ID, $url);
-        if (version_compare($wp_version, "3.9", '<')) {
-            $arr[] = array($name, $url, $desc);
-        } else {
-            $arr[] = array('title' => $name, 'url' => $url, 'description' => $desc);
-        }
-    }
+		if ( isset($_GET['template_id']) && intval($_GET['template_id']) ) {
+			$p = get_post( $_GET['template_id'] );
+			if ( $p->post_status === 'publish' ) {
+				echo apply_filters(
+					"tinymce_templates",
+					wpautop( $p->post_content ),
+					stripslashes( $p->post_content )
+				);
+			}
+			exit;
+		}
 
-    if (version_compare($wp_version, "3.9", '<')) {
-        echo 'var tinyMCETemplateList = '.json_encode($arr);
-    } else {
-        echo json_encode($arr);
-    }
+		$p = array(
+			'post_status' => 'publish',
+			'post_type'   => $this->post_type,
+			'orderby'	 => 'date',
+			'order'	   => 'DESC',
+			'numberposts' => -1,
+		);
 
-    exit;
-}
+		$posts = get_posts( $p );
+		$url	= admin_url( 'admin-ajax.php' );
+		$nonce  = wp_create_nonce( "tinymce_templates" );
 
-public function parse_query($q)
-{
-    if (is_admin() && !current_user_can('administrator') && empty($q->query['suppress_filters']) && $q->query['post_type'] === $this->post_type) {
-        $uid = get_current_user_id();
-        $q->set('author', $uid);
-        return $q;
-    } else {
-        return $q;
-    }
-}
+		$arr = array();
 
-private function get_copy_template_url($id)
-{
-    return admin_url('post-new.php?post_type=tinymcetemplates&origin='.intval($id));
-}
+		foreach ( $posts as $p ) {
+			$ID = intval( $p->ID );
+			$name = esc_html( apply_filters('tinymce_template_title', $p->post_title) );
+			$desc = esc_html( apply_filters('tinymce_template_excerpt', $p->post_excerpt) );
+			$args = array(
+				'action'      => 'tinymce_templates',
+				'template_id' => $ID,
+				'nonce'       => $nonce,
+			);
+			$url  = add_query_arg( $args, $url );
+			$arr[] = array(
+				'id' => $ID,
+				'title' => $name,
+				'url' => $url,
+				'description' => $desc,
+				'is_shortcode' => get_post_meta( $ID, 'insert_as_shortcode', true ),
+			);
+		}
+
+		echo json_encode( $arr );
+
+		exit;
+	}
+
+	/**
+	 * Returns the url for copying templates.
+	 *
+	 * @param  none
+	 * @return none
+	 */
+	private function get_copy_template_url( $id )
+	{
+		return admin_url( 'post-new.php?post_type=tinymcetemplates&origin='.intval($id) );
+	}
 
 
 } // end class tinymceTemplates
