@@ -45,7 +45,6 @@ tinymce.PluginManager.add('template', function(editor) {
 					id: template.id,
 					url: template.url,
 					content: template.content,
-					description: template.description,
 					is_shortcode: template.is_shortcode
 				}
 			});
@@ -68,7 +67,7 @@ tinymce.PluginManager.add('template', function(editor) {
 							'<head>' +
 								contentCssLinks +
 							'</head>' +
-							'<body>' +
+							'<body class="mceContentBody">' +
 								html +
 							'</body>' +
 						'</html>'
@@ -102,7 +101,6 @@ tinymce.PluginManager.add('template', function(editor) {
 				label = '\u00a0';
 			}
 
-			win.find('#description')[0].text(e.control.value().description);
 			win.find('#is_shortcode')[0].text(label);
 		}
 
@@ -120,7 +118,7 @@ tinymce.PluginManager.add('template', function(editor) {
 						type: 'listbox', label: 'Templates', name: 'template', values: values, onselect: onSelectTemplate
 					}}
 				]},
-				{type: 'label', name: 'description', label: 'Description', text: '\u00a0'},
+
 				{type: 'iframe', flex: 1, border: 1},
 				{type: 'label', name: 'is_shortcode', label: '', text: '\u00a0'},
 			],
@@ -138,19 +136,41 @@ tinymce.PluginManager.add('template', function(editor) {
 
 	function insertTemplate(ui, html, id, is_shortcode) {
 		if (is_shortcode) {
-			editor.execCommand('mceInsertContent', false, '<p>[template id="'+id+'"]</p>');
+			var tags = html.match(/{\$([a-zA-Z0-9_]+?)}/g);
+
+			var args = [];
+			var is_content = '';
+
+			if (tags) {
+				for (var i=0; i<tags.length; i++) {
+					var tag = tags[i].match(/[a-zA-Z0-9_]+/);
+					if ('content' === tag[0]) {
+						is_content = 'Hello World![/template]';
+						continue;
+					}
+					args.push(tag[0] + '=""');
+				}
+			}
+
+			if (0 < args.length) {
+				html = '<p>[template id="' + id + '" ' + args.join(' ')+']' + is_content + '</p>';
+			} else {
+				html = '<p>[template id="' + id + '"]' + is_content + '</p>';
+			}
+
+			editor.execCommand('mceInsertContent', false, html);
 			editor.addVisual();
-			return;
+		} else {
+			var el, n, dom = editor.dom, sel = editor.selection.getContent();
+			el = dom.create('div', null, html);
+
+			editor.execCommand('mceInsertContent', false, el.innerHTML);
+			editor.addVisual();
 		}
-
-		var el, n, dom = editor.dom, sel = editor.selection.getContent();
-		el = dom.create('div', null, html);
-
-		editor.execCommand('mceInsertContent', false, el.innerHTML);
-		editor.addVisual();
 	}
 
 	editor.addCommand('mceInsertTemplate', insertTemplate);
+	editor.addCommand('createTemplateList', createTemplateList(showDialog));
 
 	editor.addButton('template', {
 		title: 'Insert template',
