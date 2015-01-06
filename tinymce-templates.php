@@ -4,7 +4,7 @@ Plugin Name: TinyMCE Templates
 Plugin URI: http://miya0001.github.io/tinymce-templates/
 Description: TinyMCE Templates plugin will enable to use HTML template on WordPress Visual Editor.
 Author: Takayuki Miyauchi
-Version: 4.2.0
+Version: 4.2.1
 Author URI: http://miya0001.github.io/tinymce-templates/
 Domain Path: /languages
 Text Domain: tinymce_templates
@@ -152,6 +152,8 @@ class TinyMCE_Templates {
 	 */
 	public function template_shortcode( $p, $content )
 	{
+		$post_content = '';
+
 		if ( isset( $p['id'] ) && intval( $p['id'] ) ) {
 			$args = array(
 				'ID' => $p['id'],
@@ -162,9 +164,11 @@ class TinyMCE_Templates {
 			$post = get_post( $p['id'] );
 
 			if ( $post && get_post_meta( $p['id'], 'insert_as_shortcode', true ) ) {
-				return apply_filters( 'tinymce_templates_content', $post->post_content, $p, $content );
+				$post_content = $post->post_content;
 			}
 		}
+
+		return apply_filters( 'tinymce_templates_content', $post_content, $p, $content );
 	}
 
 	/**
@@ -515,30 +519,34 @@ EOL;
 			$ID = intval( $p->ID );
 			$name = esc_html( apply_filters( 'tinymce_template_title', $p->post_title ) );
 			$desc = esc_html( apply_filters( 'tinymce_template_excerpt', $p->post_excerpt ) );
-			$args = array(
-				'action'      => 'tinymce_templates',
-				'template_id' => $ID,
-				'nonce'       => $nonce,
-			);
-			$url  = add_query_arg( $args, $url );
 			$arr[ $ID ] = array(
 				'id'           => $ID,
 				'title'        => $name,
-				'url'          => $url,
 				'is_shortcode' => get_post_meta( $ID, 'insert_as_shortcode', true ),
-				'content'      => $p->post_content,
+				'content'      => wpautop( $p->post_content ),
 			);
 		}
 
 		$arr = apply_filters( 'tinymce_templates_post_objects', $arr );
 
-		if ( isset( $_GET['template_id'] ) && intval( $_GET['template_id'] ) ) {
-			$p = $arr[ $_GET['template_id'] ];
-			echo apply_filters(
-				'tinymce_templates',
-				$p['content'],
-				$p['content']
+		foreach ( $arr as $id => $post ) {
+			$args = array(
+				'action'      => 'tinymce_templates',
+				'template_id' => $arr[ $id ]['id'],
+				'nonce'       => $nonce,
 			);
+			$arr[ $id ]['url'] = add_query_arg( $args, $url );
+		}
+
+		if ( isset( $_GET['template_id'] ) && $_GET['template_id'] ) {
+			if ( isset( $arr[ $_GET['template_id'] ] ) && $arr[ $_GET['template_id'] ] ) {
+				$p = $arr[ $_GET['template_id'] ];
+				echo apply_filters(
+					'tinymce_templates',
+					$p['content'],
+					$p['content']
+				);
+			}
 			exit;
 		}
 
