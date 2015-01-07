@@ -4,7 +4,7 @@ Plugin Name: TinyMCE Templates
 Plugin URI: http://miya0001.github.io/tinymce-templates/
 Description: TinyMCE Templates plugin will enable to use HTML template on WordPress Visual Editor.
 Author: Takayuki Miyauchi
-Version: 4.2.1
+Version: 4.3.1
 Author URI: http://miya0001.github.io/tinymce-templates/
 Domain Path: /languages
 Text Domain: tinymce_templates
@@ -125,23 +125,47 @@ class TinyMCE_Templates {
 
 		add_action( 'admin_head', array( $this, 'admin_head' ) );
 		add_action( 'admin_footer-post-new.php', array( $this, 'admin_footer' ) );
-		add_action( 'wp_ajax_tinymce_templates', array( $this, 'wp_ajax' ) );
+		add_action( 'admin_footer-post.php', array( $this, 'admin_footer' ) );
+		add_action( 'wp_ajax_tinymce_templates', array( $this, 'wp_ajax_tinymce_templates' ) );
 		add_action( 'post_submitbox_start', array( $this, 'post_submitbox_start' ) );
 		add_action( 'wp_before_admin_bar_render', array( $this, 'wp_before_admin_bar_render' ) );
 		add_action( 'save_post', array( $this, 'save_post' ) );
 		add_action( 'media_buttons', array( $this, 'media_buttons' ), 11 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 
 		add_shortcode( 'template', array( $this, 'template_shortcode' ) );
 	}
 
+	public function admin_enqueue_scripts( $hook_suffix )
+	{
+		if ( 'post-new.php' === $hook_suffix || 'post.php' === $hook_suffix ) {
+			wp_enqueue_script(
+				'tinymce-templates',
+				plugins_url( 'js/tinymce-templates.js', __FILE__ ),
+				array( 'jquery' ),
+				filemtime( dirname( __FILE__ ) . '/js/tinymce-templates.js' ),
+				true
+			);
+
+			wp_enqueue_style(
+				'tinymce-templates',
+				plugins_url( 'css/tinymce-templates.css', __FILE__ ),
+				array(),
+				filemtime( dirname( __FILE__ ) . '/css/tinymce-templates.css' )
+			);
+		}
+	}
+
 	public function media_buttons( $editor_id = 'content' )
 	{
-		printf(
-			'<a id="button-tinymce-templates" class="button" href="#" data-editor="%s" title="%s" onclick="tinymce.execCommand(\'createTemplateList\'); return false;">%s</a>',
-			esc_attr( $editor_id ),
-			esc_attr( __( 'Insert Template', 'tinymce_templates' ) ),
-			esc_html( __( 'Insert Template', 'tinymce_templates' ) )
-		);
+		if ( 'content' === $editor_id ) {
+			printf(
+				'<a id="button-tinymce-templates" class="button" href="#" data-editor="%s" title="%s">%s</a>',
+				esc_attr( $editor_id ),
+				esc_attr( __( 'Insert Template', 'tinymce_templates' ) ),
+				esc_html( __( 'Insert Template', 'tinymce_templates' ) )
+			);
+		}
 	}
 
 	/**
@@ -262,29 +286,29 @@ class TinyMCE_Templates {
 	 */
 	public function admin_head()
 	{
-		/**
-		 * Load and setup tinymce plugin.
-		 */
-		$url	= admin_url( 'admin-ajax.php' );
-		$nonce  = wp_create_nonce( 'tinymce_templates' );
-
-		$args = array(
-			'action' => 'tinymce_templates',
-			'nonce'  => $nonce,
-		);
-
-		$url = add_query_arg( $args, $url );
-
-		$inits['templates'] = $url;
-
-		require_once( dirname( __FILE__ ) . '/includes/mceplugins.class.php' );
-
-		new tinymcePlugins(
-			'template',
-			$this->base_url.'/mce_plugins/4.0/plugins/template/plugin.js',
-			false,
-			$inits
-		);
+		// /**
+		//  * Load and setup tinymce plugin.
+		//  */
+		// $url	= admin_url( 'admin-ajax.php' );
+		// $nonce  = wp_create_nonce( 'tinymce_templates' );
+		//
+		// $args = array(
+		// 	'action' => 'tinymce_templates',
+		// 	'nonce'  => $nonce,
+		// );
+		//
+		// $url = add_query_arg( $args, $url );
+		//
+		// $inits['templates'] = $url;
+		//
+		// require_once( dirname( __FILE__ ) . '/includes/mceplugins.class.php' );
+		//
+		// new tinymcePlugins(
+		// 	'template',
+		// 	$this->base_url.'/mce_plugins/4.0/plugins/template/plugin.js',
+		// 	false,
+		// 	$inits
+		// );
 
 		/**
 		 * Hide some stuff in the templates editor panel.
@@ -463,25 +487,61 @@ class TinyMCE_Templates {
 	 */
 	public function admin_footer()
 	{
-		if ( get_post_type() === $this->post_type ) {
-			if ( isset( $_GET['origin'] ) && intval( $_GET['origin'] ) ) {
-				$origin = get_post( intval( $_GET['origin'] ) );
-				if ( $origin ) {
-					$template = array(
-						'post_title' => $origin->post_title,
-						'post_content' => wpautop( $origin->post_content ),
-					);
-					$template = json_encode( $template );
-					echo <<<EOL
-<script type="text/javascript">
-	var origin = {$template};
-	jQuery( '#title').val(origin.post_title );
-	jQuery( '#content').val(origin.post_content );
-</script>
-EOL;
+		global $hook_suffix;
+		if ( 'post-new.php' === $hook_suffix ) {
+			if ( get_post_type() === $this->post_type ) {
+				if ( isset( $_GET['origin'] ) && intval( $_GET['origin'] ) ) {
+					$origin = get_post( intval( $_GET['origin'] ) );
+					if ( $origin ) {
+						$template = array(
+							'post_title' => $origin->post_title,
+							'post_content' => wpautop( $origin->post_content ),
+						);
+						?>
+						<script type="text/javascript">
+						var origin = <?php echo json_encode( $template ); ?>;
+						jQuery( '#title').val(origin.post_title );
+						jQuery( '#content').val(origin.post_content );
+						</script>
+						<?php
+					}
 				}
 			}
 		}
+
+		?>
+		<div id="tinymce-templates-backdrop" style="desplay: none;"></div>
+		<div id="tinymce-templates-wrap" class="wp-core-ui search-panel-visible" style="desplay: none;">
+			<div class="modal">
+				<div class="header">
+					<h1><span class="dashicons dashicons-edit"></span> <?php _e( 'Insert Template', 'tinymce_templates' ); ?></h1>
+					<a href="#" class="close"><span class="dashicons dashicons-no-alt"></span></a>
+				</div>
+				<div class="container">
+					<select id="tinymce-templates-list"></select>
+					<iframe id="tinymce-templates-preview"></iframe>
+				</div>
+				<div class="footer">
+					<div id="tinymce-templates-message"><?php _e( 'Note: The template will be inserted as shortcode.', 'tinymce_templates' ); ?></div>
+					<a href="#" id="tinymce-templates-insert" class="button button-primary button-large template-button-insert" disabled><?php _e( 'Insert Template', 'tinymce_templates' ); ?></a>
+				</div>
+			</div>
+		</div>
+		<?php
+
+		$url   = admin_url( 'admin-ajax.php' );
+		$nonce = wp_create_nonce( 'tinymce_templates' );
+
+		$args = array(
+			'action' => 'tinymce_templates',
+			'nonce'  => $nonce,
+		);
+		?>
+		<script type="text/javascript">
+			var tinymce_templates_list_uri = '<?php echo $url; ?>';
+			var tinymce_templates_list_args = <?php echo json_encode($args); ?>;
+		</script>
+		<?php
 	}
 
 	/**
@@ -490,7 +550,7 @@ EOL;
 	 * @param  none
 	 * @return none
 	 */
-	public function wp_ajax()
+	public function wp_ajax_tinymce_templates()
 	{
 		nocache_headers();
 
@@ -510,9 +570,6 @@ EOL;
 
 		$posts = get_posts( $p );
 
-		$url   = admin_url( 'admin-ajax.php' );
-		$nonce = wp_create_nonce( 'tinymce_templates' );
-
 		$arr = array();
 
 		foreach ( $posts as $p ) {
@@ -520,7 +577,6 @@ EOL;
 			$name = esc_html( apply_filters( 'tinymce_template_title', $p->post_title ) );
 			$desc = esc_html( apply_filters( 'tinymce_template_excerpt', $p->post_excerpt ) );
 			$arr[ $ID ] = array(
-				'id'           => $ID,
 				'title'        => $name,
 				'is_shortcode' => get_post_meta( $ID, 'insert_as_shortcode', true ),
 				'content'      => wpautop( $p->post_content ),
@@ -529,28 +585,23 @@ EOL;
 
 		$arr = apply_filters( 'tinymce_templates_post_objects', $arr );
 
-		foreach ( $arr as $id => $post ) {
-			$args = array(
-				'action'      => 'tinymce_templates',
-				'template_id' => $arr[ $id ]['id'],
-				'nonce'       => $nonce,
-			);
-			$arr[ $id ]['url'] = add_query_arg( $args, $url );
-		}
-
 		if ( isset( $_GET['template_id'] ) && $_GET['template_id'] ) {
 			if ( isset( $arr[ $_GET['template_id'] ] ) && $arr[ $_GET['template_id'] ] ) {
 				$p = $arr[ $_GET['template_id'] ];
-				echo apply_filters(
+				$content = apply_filters(
 					'tinymce_templates',
 					$p['content'],
 					$p['content']
 				);
+				echo json_encode( array(
+					'content' => $content,
+					'is_shortcode' => $p['is_shortcode']
+				) );
 			}
 			exit;
 		}
 
-		echo json_encode( array_values( $arr ) );
+		echo json_encode( $arr );
 		exit;
 	}
 
