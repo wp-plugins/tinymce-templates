@@ -40,6 +40,13 @@ var tinymceTemplates;
 			$('#tinymce-templates-list').bind('change', function(){
 				tinymceTemplates.set_content();
 			});
+
+			$(window).keyup(function(e){
+				if(e.keyCode == 27){
+					e.preventDefault();
+					tinymceTemplates.close();
+				}
+			});
 		},
 
 		insert: function()
@@ -58,7 +65,7 @@ var tinymceTemplates;
 					for (var i=0; i<tags.length; i++) {
 						var tag = tags[i].match(/[a-zA-Z0-9_]+/);
 						if ('content' === tag[0]) {
-							is_content = 'Hello World![/template]';
+							is_content = '</p><p>[/template]';
 							continue;
 						}
 						args.push(tag[0] + '=""');
@@ -103,6 +110,10 @@ var tinymceTemplates;
 		{
 			$('#tinymce-templates-insert').attr('disabled', true);
 
+			if (!$('#tinymce-templates-list').val()) {
+				return;
+			}
+
 			tinymceTemplates.template_id = $('#tinymce-templates-list').val();
 
 			// I don't like reference here!!
@@ -120,13 +131,14 @@ var tinymceTemplates;
 				var styles = content_css.replace(/(\s+)/g, "").split(',');
 
 				var html = '<!DOCTYPE html><html><head>';
+				html += '<style>body{ padding: 0 !important; margin: 20px !important; }</style>';
 				for (var i=0; i<styles.length; i++) {
 					var link = $('<link rel="stylesheet" type="text/css" media="all" />');
 					link.attr('href', styles[i]);
 					html += $('<div />').html(link).html(); // getting innerHTML
 				}
 				html += '</head><body class="mceContentBody">';
-				html += data.content;
+				html += data.preview;
 				html += '</body></html>';
 
 				var iframe = document.getElementById('tinymce-templates-preview');
@@ -179,10 +191,10 @@ var tinymceTemplates;
 			$('#tinymce-templates-preview').css('height', windowHeight * 0.5);
 
 			var height = $('#tinymce-templates-wrap').height();
-
 			var top = (windowHeight / 2) - (height / 2) - ($('#wpadminbar').height() / 2);
-			if (top < (0 - $('#wpadminbar').height() + 8)) {
-				top = (0 - $('#wpadminbar').height() + 8);
+
+			if (top < 16) {
+				top = 16;
 			} else if (top > 100) {
 				top = 100;
 			}
