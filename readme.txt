@@ -2,8 +2,8 @@
 Contributors: miyauchi
 Tags: tinymce, Visual Editor, template
 Requires at least: 4.0
-Tested up to: 4.1
-Stable tag: 4.3.4
+Tested up to: 4.3
+Stable tag: 4.4.0
 
 TinyMCE Template plugin will enable to use HTML template on WordPress Visual Editor.
 
@@ -26,7 +26,7 @@ TinyMCE Template plugin will enable to use HTML template on WordPress Visual Edi
 * Japanese(ja) - [Takayuki Miyauchi](http://wpist.me/)
 * Italian(it_IT) - [Andrea Bersi](http://www.andreabersi.com)
 * Swedish(sv_SE) - Tobias Bergius
-* German(de_DE) - [Martin Lettner](http://www.martinlettner.info/)
+* German(de_DE) - [nebojsa-simic](https://github.com/nebojsa-simic), [Martin Lettner](http://www.martinlettner.info/)
 * Spanish(es_ES) - [David Bravo](http://www.dimensionmultimedia.com/)
 * Dutch(nl_NL) - [Frank Groeneveld](http://ivaldi.nl/)
 * French(fr_FR) - [HAROUY Jean-Michel](http://www.laposte.net/)
@@ -39,6 +39,13 @@ TinyMCE Template plugin will enable to use HTML template on WordPress Visual Edi
 
 You can send your own language pack to me.
 
+= Note =
+
+How to display insert template button on wysiwyg editor of the ACF.
+
+add_filter( 'tinymce_templates_enable_media_buttons', function(){
+    return true; // Displays insert template button on all visual editors
+} );
 
 == Installation ==
 
@@ -55,6 +62,19 @@ You can send your own language pack to me.
 4. Copy to new template from Admin Bar.
 
 == Changelog ==
+
+= 4.4.0 =
+
+* Bug fix when richedit is enabled.
+* Add filter hook `tinymce_templates_enable_media_buttons`.
+
+= 4.3.6 =
+
+* Update German translation.
+
+= 4.3.5 =
+
+* Tested up to WordPress 4.2.
 
 = 4.3.3 =
 
